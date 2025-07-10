@@ -1,10 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
     let currentStep = 1;
-    const totalSteps = 13;
+    const totalSteps = 12; // Se actualiza el número total de pasos
     let dbData = {};
     const userData = {};
 
-    // Cargar la base de datos
     fetch('database.json')
         .then(response => response.json())
         .then(data => {
@@ -18,6 +17,10 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.step').forEach(step => step.classList.remove('active'));
         const nextStepElement = document.getElementById(`step-${stepNumber}`);
         if (nextStepElement) {
+            // Corrección: Cargar contenido del paso 4 cuando se muestra
+            if (stepNumber === 4) {
+                updateObjectiveExamples();
+            }
             nextStepElement.classList.add('active');
             currentStep = stepNumber;
         } else {
@@ -40,6 +43,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const bloomDomainsDiv = document.getElementById('bloom-domains');
         objectiveExamplesDiv.innerHTML = '';
         bloomDomainsDiv.innerHTML = '';
+        userData.career = document.getElementById('career-select').value;
+        userData.subject = document.getElementById('subject-input').value;
 
         Object.values(dbData.bloomTaxonomy).forEach(domain => {
             const domainDiv = document.createElement('div');
@@ -48,8 +53,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const randomLevel = domain.levels[Math.floor(Math.random() * domain.levels.length)];
             const randomVerb = randomLevel.verbs[Math.floor(Math.random() * randomLevel.verbs.length)];
-            const career = userData.career || 'Nutrición';
-            const subject = userData.subject || 'Biología Celular';
+            const career = userData.career || 'la carrera seleccionada';
+            const subject = userData.subject || 'la asignatura';
             
             const exampleP = document.createElement('p');
             exampleP.innerHTML = `<strong>Ejemplo (${domain.name} - Nivel ${randomLevel.level}):</strong> "${randomVerb.charAt(0).toUpperCase() + randomVerb.slice(1)} [objeto de conocimiento relevante para ${subject} de ${career}] mediante [método o herramienta] para [finalidad del aprendizaje]."`;
@@ -63,7 +68,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.next-btn').forEach(button => {
             button.addEventListener('click', () => {
                 if (captureDataForStep(currentStep)) {
-                    if (currentStep === 4) updateObjectiveExamples();
                     showStep(currentStep + 1);
                 }
             });
@@ -74,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         document.getElementById('generate-proposals-btn').addEventListener('click', () => {
-            if (captureDataForStep(10)) {
+            if (captureDataForStep(9)) { // Ahora es el paso 9
                 prepareAndShowProposals();
             }
         });
@@ -84,17 +88,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         document.getElementById('restart-btn').addEventListener('click', () => location.reload());
-        document.getElementById('finish-btn').addEventListener('click', () => showStep(13));
+        document.getElementById('finish-btn').addEventListener('click', () => showStep(12)); // Ahora es el paso 12
         document.getElementById('start-over-btn').addEventListener('click', () => location.reload());
         
-        // Lógica para mostrar/ocultar el textarea de información adicional
         document.querySelectorAll('input[name="extra-info"]').forEach(radio => {
             radio.addEventListener('change', (event) => {
                 document.getElementById('extra-info-details').classList.toggle('hidden', event.target.value !== 'si');
             });
         });
 
-        // Lógica para el uso de IA
         document.querySelectorAll('input[name="use-ai"]').forEach(radio => {
             radio.addEventListener('change', (event) => {
                 const levelSelectionDiv = document.getElementById('ai-level-selection');
@@ -122,6 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Se actualiza la lógica de captura de datos
     function captureDataForStep(step) {
         switch(step) {
             case 2:
@@ -131,26 +134,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 userData.subject = document.getElementById('subject-input').value;
                 if (!userData.subject) { alert('Por favor, ingresa el nombre de la asignatura.'); return false; }
                 break;
-            case 5:
+            case 4: // Paso combinado
                 userData.objective = document.getElementById('objective-input').value;
                 if (!userData.objective) { alert('Por favor, escribe tu objetivo de aprendizaje.'); return false; }
                 break;
-            case 6:
+            case 5: // Antes 6
                 userData.studentContext = document.getElementById('student-context-input').value;
                 if (!userData.studentContext) { alert('Por favor, describe el contexto de los estudiantes.'); return false; }
                 break;
-            case 7:
+            case 6: // Antes 7
                 userData.modality = document.querySelector('input[name="modality"]:checked')?.value;
                 if (!userData.modality) { alert('Por favor, selecciona la modalidad.'); return false; }
                 break;
-            case 8:
+            case 7: // Antes 8
                 userData.duration = document.getElementById('duration-input').value;
                  if (!userData.duration) { alert('Por favor, especifica la duración.'); return false; }
                 break;
-            case 9:
+            case 8: // Antes 9
                  userData.restrictions = document.getElementById('restrictions-input').value;
                  break;
-            case 10:
+            case 9: // Antes 10
                 userData.extraInfo = document.querySelector('input[name="extra-info"]:checked').value;
                 if (userData.extraInfo === 'si') {
                     userData.extraInfoDetails = document.getElementById('extra-info-details').value;
@@ -161,30 +164,29 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function prepareAndShowProposals() {
+        // Esta función ahora muestra el paso 10
         const useAI = confirm("¿Deseas que los estudiantes utilicen IA en la actividad?");
-        
         if (useAI) {
             document.getElementById('ai-usage-prompt').classList.remove('hidden');
             document.getElementById('activity-proposals-container').classList.add('hidden');
         } else {
             document.getElementById('ai-usage-prompt').classList.add('hidden');
             document.getElementById('activity-proposals-container').classList.remove('hidden');
-             userData.useAI = 'no';
+            userData.useAI = 'no';
             generateActivityProposals();
         }
-        showStep(11);
+        showStep(10);
     }
     
     function generateActivityProposals() {
         const container = document.getElementById('activity-proposals-container');
         container.innerHTML = '<h3>Generando propuestas...</h3>';
         
-        setTimeout(() => { // Simula llamada a Gemini
+        setTimeout(() => { 
             container.innerHTML = '';
             document.getElementById('activity-proposals-container').classList.remove('hidden');
             document.getElementById('regenerate-proposals-btn').classList.remove('hidden');
 
-            // Lógica de generación (simplificada para el ejemplo)
             for (let i = 1; i <= 2; i++) {
                 const proposalDiv = document.createElement('div');
                 proposalDiv.classList.add('proposal');
@@ -216,8 +218,6 @@ document.addEventListener('DOMContentLoaded', () => {
             
             document.querySelectorAll('.select-proposal-btn').forEach(button => {
                 button.addEventListener('click', (event) => {
-                    const selectedProposalId = event.target.getAttribute('data-proposal-id');
-                    // Simplemente usaremos el contenido de la propuesta seleccionada para generar la vista final
                     const proposalContent = event.target.parentElement.innerHTML; 
                     generateFinalActivity(proposalContent);
                 });
@@ -246,8 +246,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         rubricHtml += `</table>`;
-        
-        // Extraer la información relevante de la propuesta seleccionada
+
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = proposalContent;
         const title = tempDiv.querySelector('h4').innerText;
@@ -259,7 +258,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ${descriptions}
             ${rubricHtml}
         `;
-        showStep(12);
+        showStep(11); // Mostrar el paso final (ahora es 11)
     }
 
 });
