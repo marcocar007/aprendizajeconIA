@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asesor Pedagógico con IA</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Asesor Pedagógico con IA</h1>
+        <p class="author">Creada por el maestro Marco Carlos Avalos Rosado</p>
+    </header>
+    <main id="app-container">
+        <div id="step-1" class="step active">
+            <h2>Bienvenido(a)</h2>
+            <p>Soy tu guía para diseñar actividades de aprendizaje innovadoras, con o sin el uso de inteligencia artificial. Mi propósito es ayudarte a crear experiencias educativas significativas para tus estudiantes universitarios, fundamentadas en sólidos principios pedagógicos, cognitivos y éticos.</p>
+            <button id="start-btn" class="next-btn">Comenzar</button>
+        </div>
+
+        <div id="step-2" class="step">
+            <h2>Contexto Académico</h2>
+            <label for="career-select">¿En qué carrera se aplicará la actividad de aprendizaje?</label>
+            <select id="career-select" name="career"></select>
+            <div class="navigation-buttons">
+                <button class="prev-btn">Anterior</button>
+                <button class="next-btn">Siguiente</button>
+            </div>
+        </div>
+
+        <div id="step-3" class="step">
+            <h2>Nombre de la Asignatura</h2>
+            <label for="subject-input">¿Cuál es el nombre de la asignatura?</label>
+            <input type="text" id="subject-input" placeholder="Ej: Biología Celular y Molecular">
+            <div class="navigation-buttons">
+                <button class="prev-btn">Anterior</button>
+                <button class="next-btn">Siguiente</button>
+            </div>
+        </div>
+
+        <div id="step-4" class="step">
+            <h2>Definiendo el Objetivo de Aprendizaje</h2>
+            <p>Un objetivo de aprendizaje claro es la brújula de tu actividad. Utilizaremos la <strong>Taxonomía de Bloom</strong> para definirlo, la cual clasifica el aprendizaje en tres grandes dominios:</p>
+            <div id="bloom-domains"></div>
+            <p><strong>Fórmula para un buen objetivo:</strong> Verbo en infinitivo + Objeto de conocimiento (qué) + Condición (cómo) + Finalidad (para qué).</p>
+            <h4>Ejemplos Aleatorios:</h4>
+            <div id="objective-examples"></div>
+            <div class="navigation-buttons">
+                <button class="prev-btn">Anterior</button>
+                <button class="next-btn">Entendido, ¡a escribir mi objetivo!</button>
+            </div>
+        </div>
+
+        <div id="step-5" class="step">
+            <h2>Tu Objetivo de Aprendizaje</h2>
+            <label for="objective-input">Escribe aquí tu objetivo de aprendizaje:</label>
+            <textarea id="objective-input" rows="4" placeholder="Ej: Identificar la función de los diferentes orgánulos celulares, tanto en células animales como vegetales, mediante un modelo 3D, para comprender su importancia en los procesos vitales."></textarea>
+            <div class="navigation-buttons">
+                <button class="prev-btn">Anterior</button>
+                <button class="next-btn">Siguiente</button>
+            </div>
+        </div>
+
+        <div id="step-6" class="step">
+            <h2>Contexto de los Estudiantes</h2>
+            <label for="student-context-input">Describe brevemente el contexto de tus estudiantes:</label>
+            <textarea id="student-context-input" rows="4" placeholder="Ej: Son 35 estudiantes de primer cuatrimestre. La mayoría tiene acceso a internet y a sus propios dispositivos, pero el acceso a IA generativa es variado."></textarea>
+            <div class="navigation-buttons">
+                <button class="prev-btn">Anterior</button>
+                <button class="next-btn">Siguiente</button>
+            </div>
+        </div>
+
+        <div id="step-7" class="step">
+            <h2>Modalidad de la Actividad</h2>
+            <p>¿Dónde se realizará la actividad?</p>
+            <input type="radio" id="in-class" name="modality" value="en clase">
+            <label for="in-class">En el salón de clases, supervisada por el docente.</label><br>
+            <input type="radio" id="homework" name="modality" value="en casa">
+            <label for="homework">Como tarea, para hacer en casa de forma independiente.</label><br>
+            <div class="navigation-buttons">
+                <button class="prev-btn">Anterior</button>
+                <button class="next-btn">Siguiente</button>
+            </div>
+        </div>
+
+        <div id="step-8" class="step">
+            <h2>Duración de la Actividad</h2>
+            <label for="duration-input">¿Cuánto tiempo debe durar la actividad? (en minutos u horas)</label>
+            <input type="text" id="duration-input" placeholder="Ej: 90 minutos">
+            <div class="navigation-buttons">
+                <button class="prev-btn">Anterior</button>
+                <button class="next-btn">Siguiente</button>
+            </div>
+        </div>
+
+        <div id="step-9" class="step">
+            <h2>Especificaciones o Restricciones</h2>
+            <label for="restrictions-input">¿Hay alguna especificación o restricción para la actividad?</label>
+            <textarea id="restrictions-input" rows="4" placeholder="Ej: Deben usar únicamente papel y pluma. No se permite el uso de dispositivos electrónicos."></textarea>
+            <div class="navigation-buttons">
+                <button class="prev-btn">Anterior</button>
+                <button class="next-btn">Siguiente</button>
+            </div>
+        </div>
+        
+        <div id="step-10" class="step">
+            <h2>Información Adicional</h2>
+            <p>¿Hay algún archivo o información específica que deba considerar para generar la actividad?</p>
+            <input type="radio" id="extra-info-yes" name="extra-info" value="si">
+            <label for="extra-info-yes">Sí</label><br>
+            <input type="radio" id="extra-info-no" name="extra-info" value="no" checked>
+            <label for="extra-info-no">No</label><br>
+            <textarea id="extra-info-details" class="hidden" rows="4" placeholder="Describe la información o pega el texto aquí..."></textarea>
+            <div class="navigation-buttons">
+                <button class="prev-btn">Anterior</button>
+                <button id="generate-proposals-btn">Generar Propuestas de Actividad</button>
+            </div>
+        </div>
+
+        <div id="step-11" class="step">
+            <h2>Propuestas de Actividad</h2>
+            <div id="ai-usage-prompt" class="hidden">
+                <h3>Uso de Inteligencia Artificial</h3>
+                <p>Existen diferentes marcos para integrar la IA en el aprendizaje. A continuación se presentan algunos:</p>
+                <div id="ai-frameworks-info"></div>
+                <p><strong>¿Deseas que tus estudiantes utilicen IA en la actividad?</strong></p>
+                <input type="radio" id="use-ai-yes" name="use-ai" value="si">
+                <label for="use-ai-yes">Sí</label><br>
+                <input type="radio" id="use-ai-no" name="use-ai" value="no">
+                <label for="use-ai-no">No</label><br>
+                
+                <div id="ai-level-selection" class="hidden">
+                    <label for="ai-framework-select">Elige la escala a utilizar:</label>
+                    <select id="ai-framework-select">
+                        <option value="unsw">Niveles de Uso de IA (UNSW)</option>
+                        <option value="aias">Escala AIAS</option>
+                    </select>
+                    <label for="ai-level-select">¿Qué nivel de uso tendrán los estudiantes?</label>
+                    <select id="ai-level-select"></select>
+                </div>
+            </div>
+            
+            <div id="activity-proposals-container">
+                </div>
+            <div class="navigation-buttons">
+                 <button class="prev-btn">Anterior</button>
+                 <button id="regenerate-proposals-btn" class="hidden">Generar otras dos propuestas</button>
+            </div>
+        </div>
+        
+        <div id="step-12" class="step">
+            <h2>Actividad de Aprendizaje Diseñada</h2>
+            <div id="final-activity-output">
+                </div>
+             <div class="navigation-buttons">
+                <button id="restart-btn">Diseñar otra actividad</button>
+                <button id="finish-btn">Finalizar</button>
+            </div>
+        </div>
+
+        <div id="step-13" class="step">
+            <h2>¡Proceso Finalizado!</h2>
+            <p>¡Mucha suerte con la implementación de tu actividad! Espero haberte sido de gran ayuda.</p>
+            <button id="start-over-btn">Diseñar otra actividad</button>
+        </div>
+
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>
