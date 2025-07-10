@@ -1,17 +1,20 @@
 document.addEventListener('DOMContentLoaded', () => {
     let currentStep = 1;
-    const totalSteps = 12;
+    const totalSteps = 13; // Se actualiza el número total de pasos
     let dbData = {};
     const userData = {};
 
-    fetch('database.json')
-        .then(response => response.json())
-        .then(data => {
-            dbData = data;
-            populateCareers();
-            setupEventListeners();
-        })
-        .catch(error => console.error('Error al cargar la base de datos:', error));
+    function init() {
+        fetch('database.json')
+            .then(response => response.json())
+            .then(data => {
+                dbData = data;
+                populateCareers();
+                setupEventListeners();
+                console.log("Aplicación inicializada correctamente.");
+            })
+            .catch(error => console.error('Error fatal durante la inicialización:', error));
+    }
 
     function showStep(stepNumber) {
         document.querySelectorAll('.step').forEach(step => step.classList.remove('active'));
@@ -20,19 +23,121 @@ document.addEventListener('DOMContentLoaded', () => {
             if (stepNumber === 4) {
                 updateObjectiveExamples();
             }
+            // Al mostrar el paso 10, siempre poblamos los frameworks de IA
             if (stepNumber === 10) {
-                if (document.querySelector('input[name="use-ai"]:checked')?.value === 'si') {
-                    populateAIFrameworks();
-                }
+                populateAIFrameworks();
             }
             nextStepElement.classList.add('active');
             currentStep = stepNumber;
         } else {
-            console.error(`El paso ${stepNumber} no se encontró.`);
+            console.error(`Error: El paso ${stepNumber} no se encontró en el HTML.`);
         }
     }
 
-    function populateCareers() {
+    function setupEventListeners() {
+        document.getElementById('start-btn').addEventListener('click', () => {
+            showStep(2);
+        });
+
+        document.querySelectorAll('.next-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                if (captureDataForStep(currentStep)) {
+                    showStep(currentStep + 1);
+                }
+            });
+        });
+
+        document.querySelectorAll('.prev-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                if (currentStep > 1) {
+                    showStep(currentStep - 1);
+                }
+            });
+        });
+        
+        // CORRECCIÓN: Botón principal de generación
+        document.getElementById('generate-proposals-btn').addEventListener('click', () => {
+            // Captura la última decisión del paso 10
+            captureDataForStep(10);
+            // Inicia la generación y avanza a la siguiente pantalla
+            generateActivityProposals();
+            showStep(11);
+        });
+        
+        document.getElementById('regenerate-proposals-btn').addEventListener('click', generateActivityProposals);
+        document.getElementById('restart-btn').addEventListener('click', () => location.reload());
+        document.getElementById('finish-btn').addEventListener('click', () => showStep(13)); // Ajustado
+        document.getElementById('start-over-btn').addEventListener('click', () => location.reload());
+        
+        document.querySelectorAll('input[name="extra-info"]').forEach(radio => {
+            radio.addEventListener('change', (event) => {
+                document.getElementById('extra-info-details').classList.toggle('hidden', event.target.value !== 'si');
+            });
+        });
+
+        // CORRECCIÓN: Lógica de la pregunta sobre IA en el nuevo paso 10
+        document.querySelectorAll('input[name="use-ai"]').forEach(radio => {
+            radio.addEventListener('change', (event) => {
+                const levelSelectionDiv = document.getElementById('ai-level-selection');
+                const isAISelected = event.target.value === 'si';
+                levelSelectionDiv.classList.toggle('hidden', !isAISelected);
+                if (isAISelected) {
+                    populateAILevelSelect();
+                }
+            });
+        });
+        
+        document.getElementById('ai-framework-select').addEventListener('change', populateAILevelSelect);
+    }
+
+    function captureDataForStep(step) {
+        switch(step) {
+            case 2:
+                userData.career = document.getElementById('career-select').value;
+                break;
+            case 3:
+                userData.subject = document.getElementById('subject-input').value;
+                if (!userData.subject) { alert('Por favor, ingresa el nombre de la asignatura.'); return false; }
+                break;
+            case 4:
+                userData.objective = document.getElementById('objective-input').value;
+                if (!userData.objective) { alert('Por favor, escribe tu objetivo de aprendizaje.'); return false; }
+                break;
+            case 5:
+                userData.studentContext = document.getElementById('student-context-input').value;
+                if (!userData.studentContext) { alert('Por favor, describe el contexto de los estudiantes.'); return false; }
+                break;
+            case 6:
+                userData.modality = document.querySelector('input[name="modality"]:checked')?.value;
+                if (!userData.modality) { alert('Por favor, selecciona la modalidad.'); return false; }
+                break;
+            case 7:
+                userData.duration = document.getElementById('duration-input').value;
+                 if (!userData.duration) { alert('Por favor, especifica la duración.'); return false; }
+                break;
+            case 8:
+                 userData.restrictions = document.getElementById('restrictions-input').value;
+                 break;
+            case 9:
+                userData.extraInfo = document.querySelector('input[name="extra-info"]:checked').value;
+                if (userData.extraInfo === 'si') {
+                    userData.extraInfoDetails = document.getElementById('extra-info-details').value;
+                }
+                break;
+            case 10: // Captura la decisión final sobre la IA
+                userData.useAI = document.querySelector('input[name="use-ai"]:checked').value;
+                if(userData.useAI === 'si') {
+                    userData.aiFramework = document.getElementById('ai-framework-select').value;
+                    userData.aiLevel = document.getElementById('ai-level-select').value;
+                }
+                break;
+        }
+        return true;
+    }
+
+    // --- Las demás funciones permanecen en su mayoría igual ---
+
+    function populateCareers() { /* ... sin cambios ... */ 
         const careerSelect = document.getElementById('career-select');
         dbData.careers.forEach(career => {
             const option = document.createElement('option');
@@ -42,7 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function updateObjectiveExamples() {
+    function updateObjectiveExamples() { /* ... sin cambios ... */ 
         const objectiveExamplesDiv = document.getElementById('objective-examples');
         const bloomDomainsDiv = document.getElementById('bloom-domains');
         objectiveExamplesDiv.innerHTML = '';
@@ -86,142 +191,27 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    function setupEventListeners() {
-        // CORRECCIÓN: Lógica específica y única para el botón de inicio
-        document.getElementById('start-btn').addEventListener('click', () => {
-            showStep(2); // Simplemente avanza al siguiente paso
-        });
-
-        // Lógica para todos los DEMÁS botones con la clase 'next-btn'
-        document.querySelectorAll('.next-btn').forEach(button => {
-            button.addEventListener('click', () => {
-                if (captureDataForStep(currentStep)) {
-                    showStep(currentStep + 1);
-                }
-            });
-        });
-
-        document.querySelectorAll('.prev-btn').forEach(button => {
-            button.addEventListener('click', () => {
-                if (currentStep > 1) {
-                    showStep(currentStep - 1);
-                }
-            });
-        });
-
-        document.getElementById('generate-proposals-btn').addEventListener('click', () => {
-            if (captureDataForStep(9)) {
-                prepareAndShowProposals();
-            }
-        });
-        
-        document.getElementById('regenerate-proposals-btn').addEventListener('click', () => {
-             generateActivityProposals();
-        });
-
-        document.getElementById('restart-btn').addEventListener('click', () => location.reload());
-        document.getElementById('finish-btn').addEventListener('click', () => showStep(12));
-        document.getElementById('start-over-btn').addEventListener('click', () => location.reload());
-        
-        document.querySelectorAll('input[name="extra-info"]').forEach(radio => {
-            radio.addEventListener('change', (event) => {
-                document.getElementById('extra-info-details').classList.toggle('hidden', event.target.value !== 'si');
-            });
-        });
-
-        document.querySelectorAll('input[name="use-ai"]').forEach(radio => {
-            radio.addEventListener('change', (event) => {
-                const levelSelectionDiv = document.getElementById('ai-level-selection');
-                levelSelectionDiv.classList.toggle('hidden', event.target.value !== 'si');
-                if (event.target.value === 'si') {
-                    populateAILevelSelect();
-                }
-                generateActivityProposals();
-            });
-        });
-        
-        document.getElementById('ai-framework-select').addEventListener('change', populateAILevelSelect);
-    }
-
     function populateAILevelSelect() {
-        const frameworkSelect = document.getElementById('ai-framework-select').value;
+        const frameworkKey = document.getElementById('ai-framework-select').value;
         const levelSelect = document.getElementById('ai-level-select');
         levelSelect.innerHTML = '';
-        const framework = dbData.aiFrameworks[frameworkSelect];
+        const framework = dbData.aiFrameworks[frameworkKey];
+        if (!framework) return;
+        
         framework.levels.forEach(level => {
             const option = document.createElement('option');
             option.value = level.level;
-            option.textContent = `Nivel ${level.level}: ${level.name}`;
+            option.textContent = `${frameworkKey === 'go8' ? '' : 'Nivel ' + level.level + ': '}${level.name}`;
             levelSelect.appendChild(option);
         });
     }
 
-    function captureDataForStep(step) {
-        // En el paso 1 no se captura nada. La lógica de avance es manejada por su propio listener.
-        switch(step) {
-            case 2:
-                userData.career = document.getElementById('career-select').value;
-                break;
-            case 3:
-                userData.subject = document.getElementById('subject-input').value;
-                if (!userData.subject) { alert('Por favor, ingresa el nombre de la asignatura.'); return false; }
-                break;
-            case 4:
-                userData.objective = document.getElementById('objective-input').value;
-                if (!userData.objective) { alert('Por favor, escribe tu objetivo de aprendizaje.'); return false; }
-                break;
-            case 5:
-                userData.studentContext = document.getElementById('student-context-input').value;
-                if (!userData.studentContext) { alert('Por favor, describe el contexto de los estudiantes.'); return false; }
-                break;
-            case 6:
-                userData.modality = document.querySelector('input[name="modality"]:checked')?.value;
-                if (!userData.modality) { alert('Por favor, selecciona la modalidad.'); return false; }
-                break;
-            case 7:
-                userData.duration = document.getElementById('duration-input').value;
-                 if (!userData.duration) { alert('Por favor, especifica la duración.'); return false; }
-                break;
-            case 8:
-                 userData.restrictions = document.getElementById('restrictions-input').value;
-                 break;
-            case 9:
-                userData.extraInfo = document.querySelector('input[name="extra-info"]:checked').value;
-                if (userData.extraInfo === 'si') {
-                    userData.extraInfoDetails = document.getElementById('extra-info-details').value;
-                }
-                break;
-        }
-        return true;
-    }
-
-    function prepareAndShowProposals() {
-        const useAI = confirm("¿Deseas que los estudiantes utilicen IA en la actividad?");
-        if (useAI) {
-            document.getElementById('use-ai-yes').checked = true;
-            populateAIFrameworks();
-            document.getElementById('ai-usage-prompt').classList.remove('hidden');
-            document.getElementById('ai-level-selection').classList.remove('hidden');
-            populateAILevelSelect();
-            generateActivityProposals();
-        } else {
-            document.getElementById('use-ai-no').checked = true;
-            document.getElementById('ai-usage-prompt').classList.remove('hidden');
-            document.getElementById('ai-level-selection').classList.add('hidden');
-            document.getElementById('ai-frameworks-info').innerHTML = '';
-            userData.useAI = 'no';
-            generateActivityProposals();
-        }
-        showStep(10);
-    }
-    
     function generateActivityProposals() {
         const container = document.getElementById('activity-proposals-container');
         container.innerHTML = '<h3>Generando propuestas...</h3>';
         
         setTimeout(() => { 
             container.innerHTML = '';
-            document.getElementById('activity-proposals-container').classList.remove('hidden');
             document.getElementById('regenerate-proposals-btn').classList.remove('hidden');
 
             for (let i = 1; i <= 2; i++) {
@@ -234,14 +224,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 let activityDescription = `Esta actividad se basa en los principios de <strong>${randomPedagogue.name}</strong>. Se enfoca en el aprendizaje ${randomPedagogue.focus} y promueve la colaboración.`;
                 let useAIDescription = ``;
 
-                if (document.querySelector('input[name="use-ai"]:checked')?.value === 'si') {
-                     const selectedFrameworkKey = document.getElementById('ai-framework-select').value;
-                     const selectedFramework = dbData.aiFrameworks[selectedFrameworkKey];
-                     const selectedLevelValue = document.getElementById('ai-level-select').value;
-                     const selectedLevel = selectedFramework.levels.find(l => l.level == selectedLevelValue);
-                     useAIDescription = `<p><strong>Uso de IA:</strong> Se utilizará la IA bajo el marco de <strong>${selectedFramework.name}</strong>, en el <strong>Nivel ${selectedLevel.level}: ${selectedLevel.name}</strong>. ${selectedLevel.description}</p>`;
+                if (userData.useAI === 'si') {
+                     const selectedFramework = dbData.aiFrameworks[userData.aiFramework];
+                     const selectedLevel = selectedFramework.levels.find(l => l.level == userData.aiLevel);
+                     useAIDescription = `<p><strong>Uso de IA:</strong> Se utilizará la IA bajo el marco de <strong>${selectedFramework.name}</strong>, en el nivel "<strong>${selectedLevel.name}</strong>". ${selectedLevel.description}</p>`;
                 } else {
-                    useAIDescription = `<p><strong>Uso de IA:</strong> Esta actividad está diseñada para ser completada sin el uso de herramientas de inteligencia artificial generativa, fomentando el pensamiento original y la interacción directa.</p>`;
+                    useAIDescription = `<p><strong>Uso de IA:</strong> Esta actividad está diseñada para ser completada sin el uso de herramientas de inteligencia artificial generativa.</p>`;
                 }
                 
                 proposalDiv.innerHTML = `
@@ -267,7 +255,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function generateFinalActivity(proposalContent) {
         const finalOutput = document.getElementById('final-activity-output');
-        const useAI = document.querySelector('input[name="use-ai"]:checked')?.value === 'si';
         
         let rubricHtml = `
             <h4>Rúbrica de Evaluación</h4>
@@ -275,10 +262,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 <tr><th>Criterio</th><th>Descripción</th><th>Puntaje</th></tr>
                 <tr><td>Comprensión del Objetivo</td><td>Demuestra una clara comprensión del objetivo de aprendizaje a través de su trabajo.</td><td>25%</td></tr>
                 <tr><td>Calidad del Análisis/Ejecución</td><td>La ejecución de la actividad es rigurosa, detallada y bien fundamentada.</td><td>40%</td></tr>
-                <tr><td>Colaboración / Participación</td><td>Participa activamente y contribuye de manera constructiva al trabajo en equipo (si aplica).</td><td>15%</td></tr>
+                <tr><td>Colaboración / Participación</td><td>Participa activamente y contribuye de manera constructiva (si aplica).</td><td>15%</td></tr>
         `;
 
-        if (useAI) {
+        if (userData.useAI === 'si') {
             rubricHtml += `<tr><td>Uso Ético y Crítico de la IA</td><td>Utiliza la IA de acuerdo a las pautas, citando su uso y reflexionando críticamente sobre los resultados.</td><td>20%</td></tr>`;
         } else {
             rubricHtml += `<tr><td>Originalidad y Pensamiento Crítico</td><td>Aporta ideas originales y un análisis crítico sin depender de ayudas externas.</td><td>20%</td></tr>`;
@@ -297,7 +284,9 @@ document.addEventListener('DOMContentLoaded', () => {
             ${descriptions}
             ${rubricHtml}
         `;
-        showStep(11);
+        showStep(12); // Avanza a la pantalla final
     }
 
+    // Inicia la aplicación
+    init();
 });
