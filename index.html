@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Asesor Pedagógico con IA</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
     <header>
@@ -114,18 +115,13 @@
         <div id="step-10" class="step">
             <h2>Uso de Inteligencia Artificial en la Actividad</h2>
             <p>Integrar la IA de forma efectiva requiere intencionalidad pedagógica. Los siguientes marcos de referencia son importantes porque proporcionan una guía clara a docentes y estudiantes sobre cómo y cuándo se puede utilizar la IA, fomentando la transparencia, la equidad y la honestidad académica.</p>
-            
-            <div id="ai-frameworks-info">
-                </div>
-            
+            <div id="ai-frameworks-info"></div>
             <hr style="margin: 20px 0;">
-
             <p><strong>Considerando lo anterior, ¿deseas que tus estudiantes utilicen IA en esta actividad?</strong></p>
             <input type="radio" id="use-ai-yes" name="use-ai" value="si">
             <label for="use-ai-yes">Sí, deseo integrar la IA.</label><br>
             <input type="radio" id="use-ai-no" name="use-ai" value="no" checked>
             <label for="use-ai-no">No, esta actividad será sin IA.</label><br>
-            
             <div id="ai-level-selection" class="hidden" style="margin-top: 15px;">
                 <label for="ai-framework-select">Elige la escala a utilizar:</label>
                 <select id="ai-framework-select">
@@ -136,7 +132,6 @@
                 <label for="ai-level-select">¿Qué nivel de uso tendrán los estudiantes?</label>
                 <select id="ai-level-select"></select>
             </div>
-
             <div class="navigation-buttons">
                 <button class="prev-btn">Anterior</button>
                 <button id="generate-proposals-btn">Generar Propuestas</button>
@@ -145,8 +140,7 @@
 
         <div id="step-11" class="step">
             <h2>Propuestas de Actividad</h2>
-            <div id="activity-proposals-container">
-                </div>
+            <div id="activity-proposals-container"></div>
             <div class="navigation-buttons">
                  <button class="prev-btn">Anterior</button>
                  <button id="regenerate-proposals-btn" class="hidden">Generar otras dos propuestas</button>
@@ -157,6 +151,12 @@
             <h2>Actividad de Aprendizaje Diseñada</h2>
             <div id="final-activity-output">
                 </div>
+            
+            <div class="download-buttons" style="margin-top: 20px; text-align: center;">
+                <button id="download-pdf-btn">📥 Descargar como PDF</button>
+                <button id="download-word-btn">📥 Descargar como Word (.doc)</button>
+            </div>
+            
              <div class="navigation-buttons">
                 <button id="restart-btn">Diseñar otra actividad</button>
                 <button id="finish-btn">Finalizar</button>
