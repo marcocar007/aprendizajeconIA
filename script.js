@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     let currentStep = 1;
-    const totalSteps = 12; // Se mantiene el número total de pasos
+    const totalSteps = 12;
     let dbData = {};
     const userData = {};
 
@@ -20,15 +20,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (stepNumber === 4) {
                 updateObjectiveExamples();
             }
-            // --- INICIO DE LA CORRECCIÓN ---
-            // Si el paso que vamos a mostrar es el 10 y el usuario eligió usar IA,
-            // nos aseguramos de que la información de los frameworks esté cargada.
             if (stepNumber === 10) {
                 if (document.querySelector('input[name="use-ai"]:checked')?.value === 'si') {
                     populateAIFrameworks();
                 }
             }
-            // --- FIN DE LA CORRECCIÓN ---
             nextStepElement.classList.add('active');
             currentStep = stepNumber;
         } else {
@@ -70,10 +66,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- INICIO DE LA NUEVA FUNCIÓN ---
     function populateAIFrameworks() {
         const frameworksInfoDiv = document.getElementById('ai-frameworks-info');
-        frameworksInfoDiv.innerHTML = ''; // Limpiar contenido previo
+        frameworksInfoDiv.innerHTML = '';
         Object.values(dbData.aiFrameworks).forEach(framework => {
             const frameworkDiv = document.createElement('div');
             let levelsHtml = '<ul>';
@@ -90,11 +85,11 @@ document.addEventListener('DOMContentLoaded', () => {
             frameworksInfoDiv.appendChild(frameworkDiv);
         });
     }
-    // --- FIN DE LA NUEVA FUNCIÓN ---
     
+    // --- FUNCIÓN CORREGIDA ---
     function setupEventListeners() {
-        document.getElementById('start-btn').addEventListener('click', () => showStep(2));
-
+        // Se elimina el listener específico para 'start-btn'.
+        // Este bloque ahora maneja TODOS los botones 'next-btn', incluido el primero.
         document.querySelectorAll('.next-btn').forEach(button => {
             button.addEventListener('click', () => {
                 if (captureDataForStep(currentStep)) {
@@ -104,7 +99,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         document.querySelectorAll('.prev-btn').forEach(button => {
-            button.addEventListener('click', () => showStep(currentStep - 1));
+            button.addEventListener('click', () => {
+                // Prevenir ir antes del paso 2
+                if (currentStep > 1) {
+                    showStep(currentStep - 1);
+                }
+            });
         });
 
         document.getElementById('generate-proposals-btn').addEventListener('click', () => {
@@ -155,6 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function captureDataForStep(step) {
+        // No hay 'case 1' porque no se captura ningún dato en la pantalla de bienvenida.
         switch(step) {
             case 2:
                 userData.career = document.getElementById('career-select').value;
@@ -195,34 +196,3 @@ document.addEventListener('DOMContentLoaded', () => {
     function prepareAndShowProposals() {
         const useAI = confirm("¿Deseas que los estudiantes utilicen IA en la actividad?");
         if (useAI) {
-            document.getElementById('use-ai-yes').checked = true;
-            populateAIFrameworks(); // Se llama a la función para cargar los datos
-            document.getElementById('ai-usage-prompt').classList.remove('hidden');
-            document.getElementById('ai-level-selection').classList.remove('hidden');
-            populateAILevelSelect();
-            generateActivityProposals();
-        } else {
-            document.getElementById('use-ai-no').checked = true;
-            document.getElementById('ai-usage-prompt').classList.remove('hidden'); // Lo mostramos para que vea su elección
-            document.getElementById('ai-level-selection').classList.add('hidden'); // pero ocultamos la selección de nivel
-            document.getElementById('ai-frameworks-info').innerHTML = ''; // Limpiamos los frameworks si dice que no
-            userData.useAI = 'no';
-            generateActivityProposals();
-        }
-        showStep(10);
-    }
-    
-    function generateActivityProposals() {
-        const container = document.getElementById('activity-proposals-container');
-        container.innerHTML = '<h3>Generando propuestas...</h3>';
-        
-        setTimeout(() => { 
-            container.innerHTML = '';
-            document.getElementById('activity-proposals-container').classList.remove('hidden');
-            document.getElementById('regenerate-proposals-btn').classList.remove('hidden');
-
-            for (let i = 1; i <= 2; i++) {
-                const proposalDiv = document.createElement('div');
-                proposalDiv.classList.add('proposal');
-                
-                const
