@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     let currentStep = 1;
-    const totalSteps = 13; // Se actualiza el número total de pasos
+    const totalSteps = 13;
     let dbData = {};
     const userData = {};
 
@@ -23,10 +23,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (stepNumber === 4) {
                 updateObjectiveExamples();
             }
-            // Al mostrar el paso 10, siempre poblamos los frameworks de IA
+            // --- ¡CORRECCIÓN CLAVE AQUÍ! ---
+            // Si el paso que vamos a mostrar es el 10, cargamos la información de los marcos de IA.
             if (stepNumber === 10) {
                 populateAIFrameworks();
             }
+            // --- FIN DE LA CORRECCIÓN ---
             nextStepElement.classList.add('active');
             currentStep = stepNumber;
         } else {
@@ -55,18 +57,15 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
         
-        // CORRECCIÓN: Botón principal de generación
         document.getElementById('generate-proposals-btn').addEventListener('click', () => {
-            // Captura la última decisión del paso 10
             captureDataForStep(10);
-            // Inicia la generación y avanza a la siguiente pantalla
             generateActivityProposals();
-            showStep(11);
+            showStep(11); // Avanza a la siguiente pantalla
         });
         
         document.getElementById('regenerate-proposals-btn').addEventListener('click', generateActivityProposals);
         document.getElementById('restart-btn').addEventListener('click', () => location.reload());
-        document.getElementById('finish-btn').addEventListener('click', () => showStep(13)); // Ajustado
+        document.getElementById('finish-btn').addEventListener('click', () => showStep(13));
         document.getElementById('start-over-btn').addEventListener('click', () => location.reload());
         
         document.querySelectorAll('input[name="extra-info"]').forEach(radio => {
@@ -75,7 +74,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        // CORRECCIÓN: Lógica de la pregunta sobre IA en el nuevo paso 10
         document.querySelectorAll('input[name="use-ai"]').forEach(radio => {
             radio.addEventListener('change', (event) => {
                 const levelSelectionDiv = document.getElementById('ai-level-selection');
@@ -124,7 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     userData.extraInfoDetails = document.getElementById('extra-info-details').value;
                 }
                 break;
-            case 10: // Captura la decisión final sobre la IA
+            case 10:
                 userData.useAI = document.querySelector('input[name="use-ai"]:checked').value;
                 if(userData.useAI === 'si') {
                     userData.aiFramework = document.getElementById('ai-framework-select').value;
@@ -134,8 +132,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         return true;
     }
-
-    // --- Las demás funciones permanecen en su mayoría igual ---
 
     function populateCareers() { /* ... sin cambios ... */ 
         const careerSelect = document.getElementById('career-select');
@@ -173,7 +169,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function populateAIFrameworks() {
         const frameworksInfoDiv = document.getElementById('ai-frameworks-info');
-        frameworksInfoDiv.innerHTML = '';
+        // Evita recargar si ya tiene contenido, para no causar un parpadeo
+        if (frameworksInfoDiv.innerHTML.trim() !== '') {
+            return;
+        }
         Object.values(dbData.aiFrameworks).forEach(framework => {
             const frameworkDiv = document.createElement('div');
             let levelsHtml = '<ul>';
@@ -221,7 +220,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const randomPedagogue = dbData.pedagogues[Math.floor(Math.random() * dbData.pedagogues.length)];
                 const randomBrainFunction = dbData.brainFunctions[Math.floor(Math.random() * dbData.brainFunctions.length)];
                 
-                let activityDescription = `Esta actividad se basa en los principios de <strong>${randomPedagogue.name}</strong>. Se enfoca en el aprendizaje ${randomPedagogue.focus} y promueve la colaboración.`;
+                let activityDescription = `Esta actividad se basa en los principios de <strong>${randomPedagogue.name}</strong>. Se enfoca en el aprendizaje ${randomPedagogue.focus}.`;
                 let useAIDescription = ``;
 
                 if (userData.useAI === 'si') {
@@ -260,15 +259,15 @@ document.addEventListener('DOMContentLoaded', () => {
             <h4>Rúbrica de Evaluación</h4>
             <table class="rubric-table">
                 <tr><th>Criterio</th><th>Descripción</th><th>Puntaje</th></tr>
-                <tr><td>Comprensión del Objetivo</td><td>Demuestra una clara comprensión del objetivo de aprendizaje a través de su trabajo.</td><td>25%</td></tr>
-                <tr><td>Calidad del Análisis/Ejecución</td><td>La ejecución de la actividad es rigurosa, detallada y bien fundamentada.</td><td>40%</td></tr>
+                <tr><td>Comprensión del Objetivo</td><td>Demuestra una clara comprensión del objetivo de aprendizaje.</td><td>25%</td></tr>
+                <tr><td>Calidad del Análisis/Ejecución</td><td>La ejecución de la actividad es rigurosa y bien fundamentada.</td><td>40%</td></tr>
                 <tr><td>Colaboración / Participación</td><td>Participa activamente y contribuye de manera constructiva (si aplica).</td><td>15%</td></tr>
         `;
 
         if (userData.useAI === 'si') {
-            rubricHtml += `<tr><td>Uso Ético y Crítico de la IA</td><td>Utiliza la IA de acuerdo a las pautas, citando su uso y reflexionando críticamente sobre los resultados.</td><td>20%</td></tr>`;
+            rubricHtml += `<tr><td>Uso Ético y Crítico de la IA</td><td>Utiliza la IA de acuerdo a las pautas, citando su uso y reflexionando sobre los resultados.</td><td>20%</td></tr>`;
         } else {
-            rubricHtml += `<tr><td>Originalidad y Pensamiento Crítico</td><td>Aporta ideas originales y un análisis crítico sin depender de ayudas externas.</td><td>20%</td></tr>`;
+            rubricHtml += `<tr><td>Originalidad y Pensamiento Crítico</td><td>Aporta ideas originales y un análisis crítico sin ayudas externas.</td><td>20%</td></tr>`;
         }
 
         rubricHtml += `</table>`;
@@ -284,9 +283,8 @@ document.addEventListener('DOMContentLoaded', () => {
             ${descriptions}
             ${rubricHtml}
         `;
-        showStep(12); // Avanza a la pantalla final
+        showStep(12);
     }
 
-    // Inicia la aplicación
     init();
 });
