@@ -43,15 +43,11 @@
             <p>Un objetivo de aprendizaje claro es la brújula de tu actividad. Utilizaremos la <strong>Taxonomía de Bloom</strong> para definirlo, la cual clasifica el aprendizaje en tres grandes dominios:</p>
             <div id="bloom-domains"></div>
             <p><strong>Fórmula para un buen objetivo:</strong> Verbo en infinitivo + Objeto de conocimiento (qué) + Condición (cómo) + Finalidad (para qué).</p>
-            
             <h4>Ejemplos Aleatorios:</h4>
             <div id="objective-examples"></div>
-        
             <hr style="margin: 20px 0;">
-        
             <label for="objective-input"><strong>Ahora, escribe aquí tu objetivo de aprendizaje:</strong></label>
-            <textarea id="objective-input" rows="4" placeholder="Ej: Identificar la función de los diferentes orgánulos celulares, tanto en células animales como vegetales, mediante un modelo 3D, para comprender su importancia en los procesos vitales."></textarea>
-        
+            <textarea id="objective-input" rows="4" placeholder="Ej: Identificar la función de los diferentes orgánulos celulares..."></textarea>
             <div class="navigation-buttons">
                 <button class="prev-btn">Anterior</button>
                 <button class="next-btn">Siguiente</button>
@@ -61,7 +57,7 @@
         <div id="step-5" class="step">
             <h2>Contexto de los Estudiantes</h2>
             <label for="student-context-input">Describe brevemente el contexto de tus estudiantes:</label>
-            <textarea id="student-context-input" rows="4" placeholder="Ej: Son 35 estudiantes de primer cuatrimestre. La mayoría tiene acceso a internet y a sus propios dispositivos, pero el acceso a IA generativa es variado."></textarea>
+            <textarea id="student-context-input" rows="4" placeholder="Ej: Son 35 estudiantes de primer cuatrimestre..."></textarea>
             <div class="navigation-buttons">
                 <button class="prev-btn">Anterior</button>
                 <button class="next-btn">Siguiente</button>
@@ -94,7 +90,7 @@
         <div id="step-8" class="step">
             <h2>Especificaciones o Restricciones</h2>
             <label for="restrictions-input">¿Hay alguna especificación o restricción para la actividad?</label>
-            <textarea id="restrictions-input" rows="4" placeholder="Ej: Deben usar únicamente papel y pluma. No se permite el uso de dispositivos electrónicos."></textarea>
+            <textarea id="restrictions-input" rows="4" placeholder="Ej: Deben usar únicamente papel y pluma..."></textarea>
             <div class="navigation-buttons">
                 <button class="prev-btn">Anterior</button>
                 <button class="next-btn">Siguiente</button>
@@ -111,33 +107,44 @@
             <textarea id="extra-info-details" class="hidden" rows="4" placeholder="Describe la información o pega el texto aquí..."></textarea>
             <div class="navigation-buttons">
                 <button class="prev-btn">Anterior</button>
-                <button id="generate-proposals-btn">Generar Propuestas de Actividad</button>
+                <button class="next-btn">Siguiente</button>
+            </div>
+        </div>
+        
+        <div id="step-10" class="step">
+            <h2>Uso de Inteligencia Artificial en la Actividad</h2>
+            <p>Integrar la IA de forma efectiva requiere intencionalidad pedagógica. Los siguientes marcos de referencia son importantes porque proporcionan una guía clara a docentes y estudiantes sobre cómo y cuándo se puede utilizar la IA, fomentando la transparencia, la equidad y la honestidad académica.</p>
+            
+            <div id="ai-frameworks-info">
+                </div>
+            
+            <hr style="margin: 20px 0;">
+
+            <p><strong>Considerando lo anterior, ¿deseas que tus estudiantes utilicen IA en esta actividad?</strong></p>
+            <input type="radio" id="use-ai-yes" name="use-ai" value="si">
+            <label for="use-ai-yes">Sí, deseo integrar la IA.</label><br>
+            <input type="radio" id="use-ai-no" name="use-ai" value="no" checked>
+            <label for="use-ai-no">No, esta actividad será sin IA.</label><br>
+            
+            <div id="ai-level-selection" class="hidden" style="margin-top: 15px;">
+                <label for="ai-framework-select">Elige la escala a utilizar:</label>
+                <select id="ai-framework-select">
+                    <option value="unsw">Niveles de Uso de IA (UNSW)</option>
+                    <option value="aias">Escala AIAS</option>
+                    <option value="go8">Enfoque de Dos Vías (Go8)</option>
+                </select>
+                <label for="ai-level-select">¿Qué nivel de uso tendrán los estudiantes?</label>
+                <select id="ai-level-select"></select>
+            </div>
+
+            <div class="navigation-buttons">
+                <button class="prev-btn">Anterior</button>
+                <button id="generate-proposals-btn">Generar Propuestas</button>
             </div>
         </div>
 
-        <div id="step-10" class="step">
+        <div id="step-11" class="step">
             <h2>Propuestas de Actividad</h2>
-            <div id="ai-usage-prompt" class="hidden">
-                <h3>Uso de Inteligencia Artificial</h3>
-                <p>Existen diferentes marcos para integrar la IA en el aprendizaje. A continuación se presentan algunos:</p>
-                <div id="ai-frameworks-info"></div>
-                <p><strong>¿Deseas que tus estudiantes utilicen IA en la actividad?</strong></p>
-                <input type="radio" id="use-ai-yes" name="use-ai" value="si">
-                <label for="use-ai-yes">Sí</label><br>
-                <input type="radio" id="use-ai-no" name="use-ai" value="no">
-                <label for="use-ai-no">No</label><br>
-                
-                <div id="ai-level-selection" class="hidden">
-                    <label for="ai-framework-select">Elige la escala a utilizar:</label>
-                    <select id="ai-framework-select">
-                        <option value="unsw">Niveles de Uso de IA (UNSW)</option>
-                        <option value="aias">Escala AIAS</option>
-                    </select>
-                    <label for="ai-level-select">¿Qué nivel de uso tendrán los estudiantes?</label>
-                    <select id="ai-level-select"></select>
-                </div>
-            </div>
-            
             <div id="activity-proposals-container">
                 </div>
             <div class="navigation-buttons">
@@ -146,7 +153,7 @@
             </div>
         </div>
         
-        <div id="step-11" class="step">
+        <div id="step-12" class="step">
             <h2>Actividad de Aprendizaje Diseñada</h2>
             <div id="final-activity-output">
                 </div>
@@ -156,7 +163,7 @@
             </div>
         </div>
 
-        <div id="step-12" class="step">
+        <div id="step-13" class="step">
             <h2>¡Proceso Finalizado!</h2>
             <p>¡Mucha suerte con la implementación de tu actividad! Espero haberte sido de gran ayuda.</p>
             <button id="start-over-btn">Diseñar otra actividad</button>
