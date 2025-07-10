@@ -23,12 +23,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (stepNumber === 4) {
                 updateObjectiveExamples();
             }
-            // --- ¡CORRECCIÓN CLAVE AQUÍ! ---
-            // Si el paso que vamos a mostrar es el 10, cargamos la información de los marcos de IA.
             if (stepNumber === 10) {
                 populateAIFrameworks();
             }
-            // --- FIN DE LA CORRECCIÓN ---
             nextStepElement.classList.add('active');
             currentStep = stepNumber;
         } else {
@@ -56,18 +53,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
         });
-        
+
         document.getElementById('generate-proposals-btn').addEventListener('click', () => {
             captureDataForStep(10);
             generateActivityProposals();
-            showStep(11); // Avanza a la siguiente pantalla
+            showStep(11);
         });
-        
+
         document.getElementById('regenerate-proposals-btn').addEventListener('click', generateActivityProposals);
         document.getElementById('restart-btn').addEventListener('click', () => location.reload());
         document.getElementById('finish-btn').addEventListener('click', () => showStep(13));
         document.getElementById('start-over-btn').addEventListener('click', () => location.reload());
-        
+
         document.querySelectorAll('input[name="extra-info"]').forEach(radio => {
             radio.addEventListener('change', (event) => {
                 document.getElementById('extra-info-details').classList.toggle('hidden', event.target.value !== 'si');
@@ -84,8 +81,44 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
         });
-        
+
         document.getElementById('ai-framework-select').addEventListener('change', populateAILevelSelect);
+
+        // --- LÓGICA PARA LOS BOTONES DE DESCARGA ---
+
+        // Listener para el botón de PDF
+        document.getElementById('download-pdf-btn').addEventListener('click', () => {
+            console.log("Generando PDF...");
+            const element = document.getElementById('final-activity-output');
+            const opt = {
+              margin:       [0.5, 0.5, 0.5, 0.5],
+              filename:     'actividad_de_aprendizaje.pdf',
+              image:        { type: 'jpeg', quality: 0.98 },
+              html2canvas:  { scale: 2, useCORS: true },
+              jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+            html2pdf().from(element).set(opt).save();
+        });
+
+        // Listener para el botón de Word
+        document.getElementById('download-word-btn').addEventListener('click', () => {
+            console.log("Generando DOC...");
+            const element = document.getElementById('final-activity-output');
+            const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' "+
+                "xmlns:w='urn:schemas-microsoft-com:office:word' "+
+                "xmlns='http://www.w3.org/TR/REC-html40'>"+
+                "<head><meta charset='utf-8'><title>Actividad de Aprendizaje</title></head><body>";
+            const footer = "</body></html>";
+            const sourceHTML = header + element.innerHTML + footer;
+            
+            const source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML);
+            const fileDownload = document.createElement("a");
+            document.body.appendChild(fileDownload);
+            fileDownload.href = source;
+            fileDownload.download = 'actividad_de_aprendizaje.doc';
+            fileDownload.click();
+            document.body.removeChild(fileDownload);
+        });
     }
 
     function captureDataForStep(step) {
@@ -133,7 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return true;
     }
 
-    function populateCareers() { /* ... sin cambios ... */ 
+    function populateCareers() {
         const careerSelect = document.getElementById('career-select');
         dbData.careers.forEach(career => {
             const option = document.createElement('option');
@@ -143,7 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function updateObjectiveExamples() { /* ... sin cambios ... */ 
+    function updateObjectiveExamples() {
         const objectiveExamplesDiv = document.getElementById('objective-examples');
         const bloomDomainsDiv = document.getElementById('bloom-domains');
         objectiveExamplesDiv.innerHTML = '';
@@ -169,7 +202,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function populateAIFrameworks() {
         const frameworksInfoDiv = document.getElementById('ai-frameworks-info');
-        // Evita recargar si ya tiene contenido, para no causar un parpadeo
         if (frameworksInfoDiv.innerHTML.trim() !== '') {
             return;
         }
