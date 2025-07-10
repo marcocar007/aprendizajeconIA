@@ -86,10 +86,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    // --- FUNCIÓN CORREGIDA ---
     function setupEventListeners() {
-        // Se elimina el listener específico para 'start-btn'.
-        // Este bloque ahora maneja TODOS los botones 'next-btn', incluido el primero.
+        // CORRECCIÓN: Lógica específica y única para el botón de inicio
+        document.getElementById('start-btn').addEventListener('click', () => {
+            showStep(2); // Simplemente avanza al siguiente paso
+        });
+
+        // Lógica para todos los DEMÁS botones con la clase 'next-btn'
         document.querySelectorAll('.next-btn').forEach(button => {
             button.addEventListener('click', () => {
                 if (captureDataForStep(currentStep)) {
@@ -100,7 +103,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.querySelectorAll('.prev-btn').forEach(button => {
             button.addEventListener('click', () => {
-                // Prevenir ir antes del paso 2
                 if (currentStep > 1) {
                     showStep(currentStep - 1);
                 }
@@ -155,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function captureDataForStep(step) {
-        // No hay 'case 1' porque no se captura ningún dato en la pantalla de bienvenida.
+        // En el paso 1 no se captura nada. La lógica de avance es manejada por su propio listener.
         switch(step) {
             case 2:
                 userData.career = document.getElementById('career-select').value;
@@ -196,3 +198,106 @@ document.addEventListener('DOMContentLoaded', () => {
     function prepareAndShowProposals() {
         const useAI = confirm("¿Deseas que los estudiantes utilicen IA en la actividad?");
         if (useAI) {
+            document.getElementById('use-ai-yes').checked = true;
+            populateAIFrameworks();
+            document.getElementById('ai-usage-prompt').classList.remove('hidden');
+            document.getElementById('ai-level-selection').classList.remove('hidden');
+            populateAILevelSelect();
+            generateActivityProposals();
+        } else {
+            document.getElementById('use-ai-no').checked = true;
+            document.getElementById('ai-usage-prompt').classList.remove('hidden');
+            document.getElementById('ai-level-selection').classList.add('hidden');
+            document.getElementById('ai-frameworks-info').innerHTML = '';
+            userData.useAI = 'no';
+            generateActivityProposals();
+        }
+        showStep(10);
+    }
+    
+    function generateActivityProposals() {
+        const container = document.getElementById('activity-proposals-container');
+        container.innerHTML = '<h3>Generando propuestas...</h3>';
+        
+        setTimeout(() => { 
+            container.innerHTML = '';
+            document.getElementById('activity-proposals-container').classList.remove('hidden');
+            document.getElementById('regenerate-proposals-btn').classList.remove('hidden');
+
+            for (let i = 1; i <= 2; i++) {
+                const proposalDiv = document.createElement('div');
+                proposalDiv.classList.add('proposal');
+                
+                const randomPedagogue = dbData.pedagogues[Math.floor(Math.random() * dbData.pedagogues.length)];
+                const randomBrainFunction = dbData.brainFunctions[Math.floor(Math.random() * dbData.brainFunctions.length)];
+                
+                let activityDescription = `Esta actividad se basa en los principios de <strong>${randomPedagogue.name}</strong>. Se enfoca en el aprendizaje ${randomPedagogue.focus} y promueve la colaboración.`;
+                let useAIDescription = ``;
+
+                if (document.querySelector('input[name="use-ai"]:checked')?.value === 'si') {
+                     const selectedFrameworkKey = document.getElementById('ai-framework-select').value;
+                     const selectedFramework = dbData.aiFrameworks[selectedFrameworkKey];
+                     const selectedLevelValue = document.getElementById('ai-level-select').value;
+                     const selectedLevel = selectedFramework.levels.find(l => l.level == selectedLevelValue);
+                     useAIDescription = `<p><strong>Uso de IA:</strong> Se utilizará la IA bajo el marco de <strong>${selectedFramework.name}</strong>, en el <strong>Nivel ${selectedLevel.level}: ${selectedLevel.name}</strong>. ${selectedLevel.description}</p>`;
+                } else {
+                    useAIDescription = `<p><strong>Uso de IA:</strong> Esta actividad está diseñada para ser completada sin el uso de herramientas de inteligencia artificial generativa, fomentando el pensamiento original y la interacción directa.</p>`;
+                }
+                
+                proposalDiv.innerHTML = `
+                    <h4>Propuesta ${i}: Actividad de ${randomPedagogue.focus}</h4>
+                    <p><strong>Descripción:</strong> ${activityDescription}</p>
+                    <p><strong>Sustento Pedagógico:</strong> ${randomPedagogue.principles}</p>
+                    <p><strong>Función Cerebral Aprovechada:</strong> ${randomBrainFunction.description}</p>
+                    ${useAIDescription}
+                    <button class="select-proposal-btn" data-proposal-id="${i}">Seleccionar esta actividad</button>
+                `;
+                container.appendChild(proposalDiv);
+            }
+            
+            document.querySelectorAll('.select-proposal-btn').forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const proposalContent = event.target.parentElement.innerHTML; 
+                    generateFinalActivity(proposalContent);
+                });
+            });
+
+        }, 1500);
+    }
+    
+    function generateFinalActivity(proposalContent) {
+        const finalOutput = document.getElementById('final-activity-output');
+        const useAI = document.querySelector('input[name="use-ai"]:checked')?.value === 'si';
+        
+        let rubricHtml = `
+            <h4>Rúbrica de Evaluación</h4>
+            <table class="rubric-table">
+                <tr><th>Criterio</th><th>Descripción</th><th>Puntaje</th></tr>
+                <tr><td>Comprensión del Objetivo</td><td>Demuestra una clara comprensión del objetivo de aprendizaje a través de su trabajo.</td><td>25%</td></tr>
+                <tr><td>Calidad del Análisis/Ejecución</td><td>La ejecución de la actividad es rigurosa, detallada y bien fundamentada.</td><td>40%</td></tr>
+                <tr><td>Colaboración / Participación</td><td>Participa activamente y contribuye de manera constructiva al trabajo en equipo (si aplica).</td><td>15%</td></tr>
+        `;
+
+        if (useAI) {
+            rubricHtml += `<tr><td>Uso Ético y Crítico de la IA</td><td>Utiliza la IA de acuerdo a las pautas, citando su uso y reflexionando críticamente sobre los resultados.</td><td>20%</td></tr>`;
+        } else {
+            rubricHtml += `<tr><td>Originalidad y Pensamiento Crítico</td><td>Aporta ideas originales y un análisis crítico sin depender de ayudas externas.</td><td>20%</td></tr>`;
+        }
+
+        rubricHtml += `</table>`;
+
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = proposalContent;
+        const title = tempDiv.querySelector('h4').innerText;
+        const descriptions = Array.from(tempDiv.querySelectorAll('p')).map(p => `<p>${p.innerHTML}</p>`).join('');
+
+        finalOutput.innerHTML = `
+            <h3>${title}</h3>
+            <p><strong>Objetivo de Aprendizaje:</strong> ${userData.objective}</p>
+            ${descriptions}
+            ${rubricHtml}
+        `;
+        showStep(11);
+    }
+
+});
