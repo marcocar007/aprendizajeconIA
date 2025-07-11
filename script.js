@@ -95,6 +95,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const career = document.getElementById('career-select').value;
         const subject = document.getElementById('subject-input').value;
 
+        // Validación para asegurar que los campos no estén vacíos antes de la llamada
+        if (!career || !subject) {
+            container.innerHTML = `<p style="color:red;">Por favor, regresa y asegúrate de haber seleccionado una carrera y escrito una materia.</p>`;
+            return;
+        }
+
         try {
             const response = await fetch('/.netlify/functions/generateExamples', {
                 method: 'POST',
@@ -103,7 +109,21 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             if (!response.ok) throw new Error('Respuesta no válida del servidor.');
 
-            const examples = await response.json();
+            // --- INICIO DE LA CORRECCIÓN CLAVE ---
+            // Leemos la respuesta como texto plano primero
+            const responseText = await response.text();
+            let examples;
+            
+            // Intentamos "limpiar" y parsear el texto
+            try {
+                // Esto elimina los ```json y ``` que la IA a veces añade
+                const cleanText = responseText.replace(/^```json\n/, '').replace(/\n```$/, '');
+                examples = JSON.parse(cleanText);
+            } catch (parseError) {
+                console.error("Error al parsear la respuesta de la IA:", responseText);
+                throw new Error("La IA devolvió un formato de respuesta inesperado.");
+            }
+            // --- FIN DE LA CORRECCIÓN CLAVE ---
             
             let tableHTML = '<table class="rubric-table">';
             tableHTML += '<thead><tr><th>Dominio</th><th>Niveles (de simple a complejo)</th><th>Ejemplo de Objetivo</th></tr></thead><tbody>';
@@ -129,7 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (error) {
             console.error("Error generando ejemplos de Bloom:", error);
-            container.innerHTML = `<p style="color:red;">No se pudieron generar los ejemplos dinámicos. Por favor, asegúrate de haber llenado la carrera y la materia.</p>`;
+            container.innerHTML = `<p style="color:red;">${error.message}</p>`;
         }
     }
 
@@ -180,7 +200,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function displayFinalActivity(index) {
-        // Usamos la librería 'marked' para convertir de Markdown a HTML de forma segura
         const finalActivityHTML = window.marked.parse(generatedProposals[index]);
         document.getElementById('final-activity-output').innerHTML = finalActivityHTML;
         showStep(12);
@@ -244,6 +263,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function populateAIFrameworks() {
         const frameworksInfoDiv = document.getElementById('ai-frameworks-info');
         if (!dbData.aiFrameworks || frameworksInfoDiv.innerHTML.trim() !== '') return;
+        frameworksInfoDiv.innerHTML = '<p>Establecer el nivel de uso de la IA es crucial para la transparencia y la equidad. Los siguientes marcos de referencia te ayudarán a definirlo:</p>';
         Object.values(dbData.aiFrameworks).forEach(framework => {
             let levelsHtml = '<ul>';
             framework.levels.forEach(level => {
