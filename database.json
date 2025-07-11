@@ -3,47 +3,20 @@
     { "name": "Nutrición" },
     { "name": "Administración y Gestión de Empresas" },
     { "name": "Ciencias de la Comunicación" },
+    { "name": "Derecho" },
     { "name": "Diseño Gráfico" },
     { "name": "Administración Deportiva" },
     { "name": "Filosofía" },
     { "name": "Ciencias Religiosas" }
   ],
   "bloomTaxonomy": {
-    "cognitive": {
-      "name": "Cognitivo (Saber)",
-      "levels": [
-        { "level": 1, "name": "Recordar", "verbs": ["definir", "listar", "nombrar"], "examples": ["Nombrar las cinco fases del ciclo celular."] },
-        { "level": 2, "name": "Comprender", "verbs": ["explicar", "resumir", "interpretar"], "examples": ["Explicar con sus propias palabras el propósito de la fotosíntesis."] },
-        { "level": 3, "name": "Aplicar", "verbs": ["resolver", "usar", "implementar"], "examples": ["Resolver un problema de balance de materia utilizando una ecuación dada."] },
-        { "level": 4, "name": "Analizar", "verbs": ["comparar", "organizar", "deconstruir"], "examples": ["Comparar las ventajas y desventajas de dos modelos económicos diferentes."] },
-        { "level": 5, "name": "Evaluar", "verbs": ["justificar", "criticar", "defender"], "examples": ["Justificar la elección de un suplemento de vitamina D para un paciente con deficiencia."] },
-        { "level": 6, "name": "Crear", "verbs": ["diseñar", "construir", "proponer"], "examples": ["Diseñar una campaña de comunicación para promover la conciencia sobre la ciberseguridad."] }
-      ]
-    },
-    "affective": {
-      "name": "Afectivo (Ser)",
-      "levels": [
-        { "level": 1, "name": "Recepción", "verbs": ["escuchar", "atender", "percibir"], "examples": ["Escuchar activamente las opiniones de otros compañeros durante un debate."] },
-        { "level": 2, "name": "Respuesta", "verbs": ["participar", "ayudar", "responder"], "examples": ["Participar voluntariamente en una actividad de servicio comunitario."] },
-        { "level": 3, "name": "Valoración", "verbs": ["valorar", "proponer", "justificar"], "examples": ["Valorar la importancia de la comunicación empática para mejorar la adherencia del paciente."] },
-        { "level": 4, "name": "Organización", "verbs": ["organizar", "integrar", "sistematizar"], "examples": ["Integrar un código de ética personal en la toma de decisiones profesionales."] },
-        { "level": 5, "name": "Caracterización", "verbs": ["actuar", "influir", "demostrar"], "examples": ["Demostrar un compromiso constante con la sostenibilidad en sus acciones diarias."] }
-      ]
-    },
-    "psychomotor": {
-      "name": "Psicomotor (Hacer)",
-      "levels": [
-        { "level": 1, "name": "Imitación", "verbs": ["copiar", "repetir", "seguir"], "examples": ["Repetir los movimientos de un instructor para realizar una técnica de laboratorio."] },
-        { "level": 2, "name": "Manipulación", "verbs": ["ejecutar", "construir", "realizar"], "examples": ["Construir un circuito eléctrico simple siguiendo un diagrama."] },
-        { "level": 3, "name": "Precisión", "verbs": ["demostrar", "perfeccionar", "calibrar"], "examples": ["Calibrar un microscopio para obtener una imagen nítida y enfocada."] },
-        { "level": 4, "name": "Articulación", "verbs": ["coordinar", "integrar", "adaptar"], "examples": ["Adaptar una técnica de cocina para sustituir un ingrediente por otro sin afectar el resultado."] },
-        { "level": 5, "name": "Naturalización", "verbs": ["dominar", "realizar con fluidez", "crear"], "examples": ["Realizar una evaluación nutricional completa de forma fluida y automática."] }
-      ]
-    }
+    "cognitive": { "name": "Cognitivo (Saber)", "description": "Implica el conocimiento, la comprensión y el pensamiento crítico.", "levels": [ { "name": "Recordar" }, { "name": "Comprender" }, { "name": "Aplicar" }, { "name": "Analizar" }, { "name": "Evaluar" }, { "name": "Crear" } ] },
+    "affective": { "name": "Afectivo (Ser)", "description": "Se relaciona con las emociones, actitudes, valores y la apreciación.", "levels": [ { "name": "Recepción" }, { "name": "Respuesta" }, { "name": "Valoración" }, { "name": "Organización" }, { "name": "Caracterización" } ] },
+    "psychomotor": { "name": "Psicomotor (Hacer)", "description": "Se enfoca en las habilidades físicas, desde la imitación hasta la creación de nuevos movimientos.", "levels": [ { "name": "Imitación" }, { "name": "Manipulación" }, { "name": "Precisión" }, { "name": "Articulación" }, { "name": "Naturalización" } ] }
   },
   "aiFrameworks": {
-    "go8": { "name": "Enfoque de Dos Vías (Go8 de Australia)", "description": "Este enfoque distingue entre dos propósitos para la evaluación con IA:", "levels": [ { "level": 1, "name": "Vía 1: Aprender usando IA", "description": "Uso de la IA como una herramienta supervisada para alcanzar un objetivo de aprendizaje, donde la IA es un medio y no el fin." }, { "level": 2, "name": "Vía 2: Aprender con y sobre la IA", "description": "Colaboración activa donde los estudiantes no solo usan la IA, sino que también analizan críticamente su funcionamiento, limitaciones y sesgos." } ] },
-    "unsw": { "name": "Niveles de Uso de IA (Universidad de Nueva Gales del Sur)", "description": "Este marco ofrece un espectro granular sobre el uso permitido de la IA en las evaluaciones.", "levels": [ { "level": 1, "name": "Sin Asistencia", "description": "Prohibición total de IAGen." }, { "level": 2, "name": "Asistencia de Edición Simple", "description": "Uso permitido solo para corregir gramática, ortografía y estilo." }, { "level": 3, "name": "Asistencia en Planificación/Diseño", "description": "Uso permitido para lluvia de ideas o esquemas iniciales." }, { "level": 4, "name": "Asistencia con Atribución", "description": "Se permite usar IA para generar borradores, pero requiere modificación humana significativa y documentación transparente del proceso." }, { "level": 5, "name": "IA como Obstáculo de Aprendizaje/Crítica", "description": "La tarea requiere que el estudiante use IA y luego critique, edite o verifique el resultado." } ] },
-    "aias": { "name": "Escala de Evaluación de IA (AIAS)", "description": "Una escala práctica para comunicar el nivel de uso de IA permitido en una tarea específica.", "levels": [ { "level": 1, "name": "Nivel 1: Sin IA", "description": "El trabajo se completa sin asistencia de IA." }, { "level": 2, "name": "Nivel 2: IA para Planificación/Edición", "description": "Uso permitido para ideación, estructuración o corrección de estilo." }, { "level": 3, "name": "Nivel 3: IA para Colaboración con Atribución", "description": "Uso permitido para generar borradores parciales, siempre que se atribuya y se edite sustancialmente." }, { "level": 4, "name": "Nivel 4: IA como Objeto de Análisis", "description": "Se utiliza IA para generar contenido que el estudiante debe analizar, criticar o mejorar como tarea principal." } ] }
+    "go8": { "name": "Enfoque de Dos Vías (Go8)", "description": "Este enfoque distingue entre dos propósitos para la evaluación con IA:", "levels": [ { "level": 1, "name": "Vía 1: Aprender usando IA", "description": "Uso de la IA como una herramienta supervisada para alcanzar un objetivo de aprendizaje." }, { "level": 2, "name": "Vía 2: Aprender con y sobre la IA", "description": "Colaboración activa donde los estudiantes analizan críticamente el funcionamiento de la IA." } ] },
+    "unsw": { "name": "Niveles de Uso (UNSW)", "description": "Este marco ofrece un espectro granular sobre el uso permitido de la IA.", "levels": [ { "level": 1, "name": "Sin Asistencia" }, { "level": 2, "name": "Asistencia de Edición Simple" }, { "level": 3, "name": "Asistencia en Planificación/Diseño" }, { "level": 4, "name": "Asistencia con Atribución" }, { "level": 5, "name": "IA como Objeto de Crítica" } ] },
+    "aias": { "name": "Escala AIAS", "description": "Una escala práctica para comunicar el nivel de uso de IA permitido.", "levels": [ { "level": 1, "name": "Nivel 1: Sin IA" }, { "level": 2, "name": "Nivel 2: IA para Planificación/Edición" }, { "level": 3, "name": "Nivel 3: IA para Colaboración con Atribución" }, { "level": 4, "name": "Nivel 4: IA como Objeto de Análisis" } ] }
   }
 }
