@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Asesor Pedagógico con IA</title>
     <link rel="stylesheet" href="style.css">
-    </head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
 <body>
     <header>
         <h1>Asesor Pedagógico con IA</h1>
@@ -17,7 +19,6 @@
             <p>Soy tu guía para diseñar actividades de aprendizaje innovadoras. Mi propósito es ayudarte a crear experiencias educativas significativas para tus estudiantes universitarios, fundamentadas en sólidos principios pedagógicos, cognitivos y éticos, y potenciadas por inteligencia artificial.</p>
             <button id="start-btn">Comenzar</button>
         </div>
-
         <div id="step-2" class="step">
             <h2>Contexto Académico</h2>
             <label for="career-select">¿En qué carrera se aplicará la actividad de aprendizaje?</label>
@@ -36,25 +37,22 @@
                 <button class="next-btn">Siguiente</button>
             </div>
         </div>
-
         <div id="step-4" class="step">
             <h2>Definiendo el Objetivo de Aprendizaje</h2>
-            <p>Un objetivo claro es la brújula de tu actividad. La <strong>Taxonomía de Bloom</strong> lo clasifica en tres dominios que van de lo más simple a lo más complejo.</p>
-            <div id="bloom-table-container">
-                </div>
+            <p>Un objetivo de aprendizaje claro debe tener la estructura: <strong>Verbo + Contenido + Propósito</strong>. A continuación, se muestran ejemplos aleatorios para cada dominio de la Taxonomía de Bloom:</p>
+            <div id="bloom-examples-container"></div>
             <hr style="margin: 20px 0;">
             <label for="objective-input"><strong>Escribe aquí tu objetivo de aprendizaje:</strong></label>
-            <textarea id="objective-input" rows="4" placeholder="Ej: Que el estudiante pueda diferenciar las estructuras de las células procariotas y eucariotas usando un microscopio óptico."></textarea>
+            <textarea id="objective-input" rows="4" placeholder="Ej: Diferenciar las estructuras de las células procariotas y eucariotas usando un microscopio óptico para comprender la base de la clasificación de los seres vivos."></textarea>
             <div class="navigation-buttons">
                 <button class="prev-btn">Anterior</button>
                 <button class="next-btn">Siguiente</button>
             </div>
         </div>
-
         <div id="step-5" class="step">
             <h2>Contexto de los Estudiantes</h2>
             <label for="student-context-input">Describe brevemente el contexto de tus estudiantes:</label>
-            <textarea id="student-context-input" rows="4" placeholder="Ej: Son 35 estudiantes de primer cuatrimestre..."></textarea>
+            <textarea id="student-context-input" rows="4" placeholder="Ej: Son 35 estudiantes de primer cuatrimestre, la mayoría con acceso limitado a IA generativa."></textarea>
             <div class="navigation-buttons">
                 <button class="prev-btn">Anterior</button>
                 <button class="next-btn">Siguiente</button>
@@ -64,9 +62,9 @@
             <h2>Modalidad de la Actividad</h2>
             <p>¿Dónde se realizará la actividad?</p>
             <input type="radio" id="in-class" name="modality" value="en clase" checked>
-            <label for="in-class">En el salón de clases, supervisada por el docente.</label><br>
+            <label for="in-class">En el salón de clases, supervisada.</label><br>
             <input type="radio" id="homework" name="modality" value="en casa">
-            <label for="homework">Como tarea, para hacer en casa de forma independiente.</label><br>
+            <label for="homework">Como tarea, independiente.</label><br>
             <div class="navigation-buttons">
                 <button class="prev-btn">Anterior</button>
                 <button class="next-btn">Siguiente</button>
@@ -74,45 +72,39 @@
         </div>
         <div id="step-7" class="step">
             <h2>Duración de la Actividad</h2>
-            <label for="duration-input">¿Cuánto tiempo debe durar la actividad? (en minutos u horas)</label>
+            <label for="duration-input">¿Cuánto tiempo debe durar la actividad?</label>
             <input type="text" id="duration-input" placeholder="Ej: 90 minutos">
             <div class="navigation-buttons">
                 <button class="prev-btn">Anterior</button>
                 <button class="next-btn">Siguiente</button>
             </div>
         </div>
-
-
         <div id="step-8" class="step">
             <h2>Especificaciones o Restricciones</h2>
-            <label for="restrictions-input">¿Hay alguna especificación o restricción para la actividad?</label>
-            <textarea id="restrictions-input" rows="4" placeholder="Ej: Uso de materiales (cartulinas), la actividad debe hacerse con papel y pluma, no hay acceso a Internet."></textarea>
-            
+            <label for="restrictions-input">¿Hay alguna especificación o restricción?</label>
+            <textarea id="restrictions-input" rows="4" placeholder="Ej: Uso de materiales (cartulinas), la actividad debe hacerse con papel y pluma, no hay Internet."></textarea>
             <label style="margin-top: 20px;">La actividad será:</label>
             <input type="radio" id="work-individual" name="work-type" value="Individual" checked>
             <label for="work-individual">Individual</label><br>
             <input type="radio" id="work-team" name="work-type" value="En equipo">
             <label for="work-team">En equipo</label><br>
-            
             <div class="navigation-buttons">
                 <button class="prev-btn">Anterior</button>
                 <button class="next-btn">Siguiente</button>
             </div>
         </div>
-        
         <div id="step-9" class="step">
             <h2>Información Adicional</h2>
-            <p>¿Hay algún archivo, texto o información específica que deba considerar para generar la actividad?</p>
-            <textarea id="extra-info-details" rows="6" placeholder="Pega aquí el texto del paper, el capítulo del libro o las notas que la IA deba usar como base..."></textarea>
+            <p>¿Hay algún archivo, texto o información específica que la IA deba usar como base?</p>
+            <textarea id="extra-info-details" rows="6" placeholder="Pega aquí el texto del paper, el capítulo del libro o las notas..."></textarea>
             <div class="navigation-buttons">
                 <button class="prev-btn">Anterior</button>
                 <button class="next-btn">Siguiente</button>
             </div>
         </div>
-        
         <div id="step-10" class="step">
             <h2>Uso de Inteligencia Artificial por los Estudiantes</h2>
-            <p>Aquí puedes definir si tus estudiantes tendrán permitido usar herramientas de IA generativa para realizar la actividad que diseñaremos.</p>
+            <p>Establecer el nivel de uso de la IA es crucial para la transparencia y la equidad. Los siguientes marcos de referencia te ayudarán a definirlo:</p>
             <div id="ai-frameworks-info"></div>
             <hr style="margin: 20px 0;">
             <p><strong>¿Permitirás que tus estudiantes utilicen IA en esta actividad?</strong></p>
@@ -121,13 +113,13 @@
             <input type="radio" id="use-ai-no" name="use-ai" value="no" checked>
             <label for="use-ai-no">No, esta actividad será sin IA.</label><br>
             <div id="ai-level-selection" class="hidden" style="margin-top: 15px;">
-                <label for="ai-framework-select">Elige la escala a utilizar:</label>
+                <label for="ai-framework-select">Elige el marco de referencia:</label>
                 <select id="ai-framework-select">
-                    <option value="unsw">Niveles de Uso de IA (UNSW)</option>
+                    <option value="unsw">Niveles de Uso (UNSW)</option>
                     <option value="aias">Escala AIAS</option>
-                    <option value="go8">Enfoque de Dos Vías (Go8)</option>
+                    <option value="go8">Enfoque Go8</option>
                 </select>
-                <label for="ai-level-select">¿Qué nivel de uso tendrán los estudiantes?</label>
+                <label for="ai-level-select">Define el nivel de uso:</label>
                 <select id="ai-level-select"></select>
             </div>
             <div class="navigation-buttons">
@@ -135,7 +127,6 @@
                 <button id="generate-activity-btn">✨ ¡Generar Actividad con IA!</button>
             </div>
         </div>
-
         <div id="step-11" class="step">
             <h2>Actividad de Aprendizaje Diseñada</h2>
             <div id="final-activity-output">
@@ -143,13 +134,13 @@
             </div>
             <div class="download-buttons" style="margin-top: 20px; text-align: center;">
                 <button id="download-pdf-btn">📥 Descargar como PDF</button>
+                <button id="download-word-btn">📥 Descargar como Word (.doc)</button>
             </div>
             <div class="navigation-buttons">
                 <button class="prev-btn">Ajustar Datos</button>
                 <button id="finish-btn">Finalizar</button>
             </div>
         </div>
-
         <div id="step-12" class="step">
             <h2>¡Proceso Finalizado!</h2>
             <p>¡Mucha suerte con la implementación de tu actividad! Ha sido un placer ayudarte a crearla.</p>
@@ -157,7 +148,5 @@
         </div>
     </main>
     <script src="script.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </body>
 </html>
