@@ -11,8 +11,13 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(data => {
                 dbData = data;
                 populateCareers();
-                populateBloomTable(); // Nueva función para la tabla
+                populateBloomTable();
                 setupEventListeners();
+                console.log("Aplicación inicializada.");
+            })
+            .catch(error => {
+                console.error('Error al cargar database.json:', error);
+                // Opcional: mostrar un error al usuario en la UI
             });
     }
 
@@ -30,38 +35,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function setupEventListeners() {
         document.getElementById('start-btn').addEventListener('click', () => showStep(2));
-
         document.querySelectorAll('.next-btn').forEach(button => {
-            button.addEventListener('click', () => {
-                if (captureDataForStep(currentStep)) {
-                    showStep(currentStep + 1);
-                }
-            });
+            button.addEventListener('click', () => showStep(currentStep + 1));
         });
-
         document.querySelectorAll('.prev-btn').forEach(button => {
-            if (currentStep > 1) {
-                showStep(currentStep - 1);
-            }
+            if (currentStep > 1) showStep(currentStep - 1);
         });
-        
-        // --- Listener para el botón principal de generación ---
         document.getElementById('generate-activity-btn').addEventListener('click', generateActivityWithAI);
-
-        document.getElementById('restart-btn')?.addEventListener('click', () => location.reload());
         document.getElementById('finish-btn').addEventListener('click', () => showStep(12));
         document.getElementById('start-over-btn').addEventListener('click', () => location.reload());
-
         document.querySelectorAll('input[name="use-ai"]').forEach(radio => {
             radio.addEventListener('change', (event) => {
                 document.getElementById('ai-level-selection').classList.toggle('hidden', event.target.value !== 'si');
                 if (event.target.value === 'si') populateAILevelSelect();
             });
         });
-
         document.getElementById('ai-framework-select').addEventListener('change', populateAILevelSelect);
-        
-        // --- Listener para el nuevo botón de descarga ---
         document.getElementById('download-pdf-btn').addEventListener('click', downloadActivityAsPDF);
     }
     
@@ -80,20 +69,18 @@ document.addEventListener('DOMContentLoaded', () => {
             userData.aiFramework = document.getElementById('ai-framework-select').value;
             userData.aiLevel = document.getElementById('ai-level-select').value;
         }
-        // Basic validation
-        if (!userData.objective || !userData.subject) {
-            alert("Por favor, asegúrate de haber completado el nombre de la asignatura y el objetivo de aprendizaje.");
-            return false;
-        }
-        return true;
     }
 
     async function generateActivityWithAI() {
-        if (!captureAllUserData()) return;
+        captureAllUserData();
+        if (!userData.objective || !userData.subject) {
+            alert("Por favor, asegúrate de haber completado el nombre de la asignatura y el objetivo de aprendizaje.");
+            return;
+        }
 
-        showStep(11); // Mover a la pantalla de carga/resultado
+        showStep(11);
         const outputDiv = document.getElementById('final-activity-output');
-        outputDiv.innerHTML = '<div class="loading-spinner"></div><p>Generando actividad... Esto puede tardar unos segundos.</p>';
+        outputDiv.innerHTML = '<div class="loading-spinner"></div><p>Conectando con la IA para generar tu actividad... Esto puede tardar unos segundos.</p>';
 
         try {
             const response = await fetch('/.netlify/functions/generateActivity', {
@@ -101,29 +88,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(userData)
             });
-
             if (!response.ok) {
-                throw new Error(`Error del servidor: ${response.statusText}`);
+                const errorData = await response.json();
+                throw new Error(errorData.error || `Error del servidor: ${response.statusText}`);
             }
-
             const data = await response.json();
             
-            // Aquí necesitaríamos una librería para convertir Markdown a HTML
-            // Por simplicidad, lo mostraremos como texto preformateado
-            // En una versión más avanzada, usaríamos "marked.js" o similar
-            outputDiv.innerHTML = `<pre>${data.activity}</pre>`;
+            // Reemplazamos los saltos de línea con <br> para que se muestren en HTML
+            const formattedHtml = data.activity.replace(/\n/g, '<br>');
+            outputDiv.innerHTML = `<div>${formattedHtml}</div>`;
 
         } catch (error) {
             console.error('Error:', error);
-            outputDiv.innerHTML = `<p style="color: red;">Lo sentimos, ocurrió un error al generar la actividad. Por favor, intenta de nuevo.</p>`;
+            outputDiv.innerHTML = `<p style="color: red;">Lo sentimos, ocurrió un error: ${error.message}. Por favor, revisa la configuración e intenta de nuevo.</p>`;
         }
     }
 
     function populateBloomTable() {
         const container = document.getElementById('bloom-table-container');
+        if (!dbData.bloomTaxonomy) return;
         let tableHTML = '<table class="rubric-table">';
-        tableHTML += '<thead><tr><th>Dominio</th><th>Nivel (de simple a complejo)</th><th>Descripción</th></tr></thead><tbody>';
-
+        tableHTML += '<thead><tr><th>Dominio</th><th>Nivel (de simple a complejo)</th><th>Verbos Clave</th></tr></thead><tbody>';
         for (const domainKey in dbData.bloomTaxonomy) {
             const domain = dbData.bloomTaxonomy[domainKey];
             domain.levels.forEach((level, index) => {
@@ -135,41 +120,39 @@ document.addEventListener('DOMContentLoaded', () => {
                 tableHTML += `</tr>`;
             });
         }
-
         tableHTML += '</tbody></table>';
         container.innerHTML = tableHTML;
     }
     
     function downloadActivityAsPDF() {
         const { jsPDF } = window.jspdf;
-        const quality = 2; // Mayor calidad para la captura de pantalla
-        const pdf = new jsPDF('p', 'pt', 'letter');
-        
         const source = document.getElementById('final-activity-output');
-        if (!source) {
-            console.error("Elemento para PDF no encontrado");
-            return;
-        }
+        if (!source) return;
     
-        html2canvas(source, {
-            scale: quality,
-            useCORS: true
-        }).then(canvas => {
+        html2canvas(source, { scale: 2, useCORS: true }).then(canvas => {
             const imgData = canvas.toDataURL('image/png');
+            const pdf = new jsPDF('p', 'pt', 'letter');
             const imgProps = pdf.getImageProperties(imgData);
-            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfWidth = pdf.internal.pageSize.getWidth() - 20; // con margen
             const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-    
-            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+            pdf.addImage(imgData, 'PNG', 10, 10, pdfWidth, pdfHeight);
             pdf.save('actividad_generada.pdf');
         });
     }
 
-    // Funciones de población que ya teníamos (sin cambios mayores)
-    function populateCareers() { /* ... sin cambios ... */ }
-    function populateAIFrameworks() { /* ... sin cambios ... */ }
-    function populateAILevelSelect() { /* ... sin cambios ... */ }
+    function populateCareers() {
+        const careerSelect = document.getElementById('career-select');
+        if (!dbData.careers) return;
+        dbData.careers.forEach(career => {
+            const option = document.createElement('option');
+            option.value = career.name;
+            option.textContent = career.name;
+            careerSelect.appendChild(option);
+        });
+    }
 
-    // Inicializar la aplicación
+    function populateAIFrameworks() { /* ... esta función no requiere cambios ... */ }
+    function populateAILevelSelect() { /* ... esta función no requiere cambios ... */ }
+
     init();
 });
