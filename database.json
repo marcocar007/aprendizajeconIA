@@ -78,12 +78,12 @@
       "name": "Niveles de Uso de IA (Universidad de Nueva Gales del Sur)",
       "description": "Este marco ofrece un espectro granular sobre el uso permitido de la IA en las evaluaciones.",
       "levels": [
-        {"level": 1, "name": "Sin Asistencia", "description": "Prohibición total de IAGen. Ideal para evaluar pensamiento original sin ayuda externa."},
+        {"level": 1, "name": "Sin Asistencia", "description": "Prohibición total de IAGen."},
         {"level": 2, "name": "Asistencia de Edición Simple", "description": "Uso permitido solo para corregir gramática, ortografía y estilo."},
-        {"level": 3, "name": "Asistencia en Planificación/Diseño", "description": "Uso permitido para lluvia de ideas o esquemas iniciales. El trabajo final debe ser de autoría humana y se debe declarar su uso."},
+        {"level": 3, "name": "Asistencia en Planificación/Diseño", "description": "Uso permitido para lluvia de ideas o esquemas iniciales."},
         {"level": 4, "name": "Asistencia con Atribución", "description": "Se permite usar IA para generar borradores, pero requiere modificación humana significativa y documentación transparente del proceso."},
-        {"level": 5, "name": "IA como Obstáculo de Aprendizaje/Crítica", "description": "La tarea requiere que el estudiante use IA y luego critique, edite o verifique el resultado, haciendo del análisis de la IA el foco de la evaluación."},
-        {"level": 6, "name": "Evaluaciones Basadas en Software de IA", "description": "La tarea se completa dentro de una herramienta de IA específica, donde su uso es inherente a la actividad."}
+        {"level": 5, "name": "IA como Obstáculo de Aprendizaje/Crítica", "description": "La tarea requiere que el estudiante use IA y luego critique, edite o verifique el resultado."},
+        {"level": 6, "name": "Evaluaciones Basadas en Software de IA", "description": "La tarea se completa dentro de una herramienta de IA específica."}
       ]
     },
     "aias": {
@@ -91,7 +91,7 @@
       "description": "Una escala práctica para comunicar el nivel de uso de IA permitido en una tarea específica.",
       "levels": [
         {"level": 1, "name": "Nivel 1: Sin IA", "description": "El trabajo se completa sin asistencia de IA."},
-        {"level": 2, "name": "Nivel 2: IA para Planificación/Edición", "description": "Uso permitido para ideación, estructuración o corrección de estilo. El contenido es humano."},
+        {"level": 2, "name": "Nivel 2: IA para Planificación/Edición", "description": "Uso permitido para ideación, estructuración o corrección de estilo."},
         {"level": 3, "name": "Nivel 3: IA para Colaboración con Atribución", "description": "Uso permitido para generar borradores parciales, siempre que se atribuya y se edite sustancialmente."},
         {"level": 4, "name": "Nivel 4: IA como Objeto de Análisis", "description": "Se utiliza IA para generar contenido que el estudiante debe analizar, criticar o mejorar como tarea principal."},
         {"level": 5, "name": "Nivel 5: Exploración con IA/Uso Completo", "description": "Se requiere o fomenta el uso de IA como un 'copiloto' en todo el proceso creativo y de producción."}
@@ -99,27 +99,20 @@
     }
   },
   "pedagogues": [
-    {"name": "Comenio", "focus": "centrado en el objeto", "principles": "Enseñanza gradual (de lo simple a lo complejo), uso de recursos visuales y aprendizaje basado en la experiencia sensorial (observación y práctica)."},
-    {"name": "Rousseau", "focus": "centrado en el estudiante", "principles": "Aprendizaje a través de la experiencia directa, respeto por el desarrollo natural y la curiosidad, y fomento de la autonomía."},
-    {"name": "Dewey", "focus": "centrado en el estudiante", "principles": "Aprender haciendo ('learning by doing'), resolución de problemas reales, reflexión sobre la experiencia y la escuela como comunidad democrática."},
-    {"name": "Montessori", "focus": "centrado en el estudiante", "principles": "Autoeducación en un 'ambiente preparado', libertad de elección, uso de materiales autocorrectivos y rol del docente como guía."},
-    {"name": "Piaget", "focus": "centrado en el estudiante", "principles": "Construcción activa del conocimiento a través de la interacción con el entorno, aprendizaje por descubrimiento y respeto a las etapas del desarrollo cognitivo."},
-    {"name": "Vygotsky", "focus": "centrado en el proceso", "principles": "Aprendizaje como proceso social mediado por el lenguaje y la interacción, concepto de Zona de Desarrollo Próximo (ZDP) y andamiaje."},
+    {"name": "Comenio", "focus": "centrado en el objeto", "principles": "Enseñanza gradual, uso de recursos visuales y aprendizaje basado en la experiencia sensorial."},
+    {"name": "Rousseau", "focus": "centrado en el estudiante", "principles": "Aprendizaje a través de la experiencia directa, respeto por el desarrollo natural y fomento de la autonomía."},
+    {"name": "Dewey", "focus": "centrado en el estudiante", "principles": "Aprender haciendo ('learning by doing'), resolución de problemas reales y reflexión sobre la experiencia."},
+    {"name": "Montessori", "focus": "centrado en el estudiante", "principles": "Autoeducación en un 'ambiente preparado', libertad de elección y uso de materiales autocorrectivos."},
+    {"name": "Piaget", "focus": "centrado en el estudiante", "principles": "Construcción activa del conocimiento, aprendizaje por descubrimiento y respeto a las etapas del desarrollo cognitivo."},
+    {"name": "Vygotsky", "focus": "centrado en el proceso", "principles": "Aprendizaje como proceso social mediado por el lenguaje, Zona de Desarrollo Próximo (ZDP) y andamiaje."},
     {"name": "Freire", "focus": "centrado en el estudiante", "principles": "Educación como práctica de la libertad, diálogo, problematización de la realidad y desarrollo de la conciencia crítica."}
   ],
   "brainFunctions": [
-    {"function": "Atención Selectiva", "description": "La actividad requiere que los estudiantes se enfoquen en información relevante, filtrando distracciones, lo cual fortalece las redes neuronales responsables de la atención."},
-    {"function": "Memoria de Trabajo", "description": "Los estudiantes deben mantener y manipular información (instrucciones, datos, objetivos) a corto plazo para completar la tarea, ejercitando la memoria de trabajo."},
-    {"function": "Codificación y Consolidación de la Memoria", "description": "Al conectar nueva información con conocimientos previos y reflexionar sobre la experiencia, se fortalecen las conexiones sinápticas, facilitando el almacenamiento a largo plazo."},
-    {"function": "Funciones Ejecutivas (Planificación y Organización)", "description": "La actividad exige planificar pasos, organizar ideas y monitorear el propio progreso, estimulando la corteza prefrontal."},
-    {"function": "Metacognición", "description": "Se fomenta la reflexión sobre el propio proceso de aprendizaje, evaluando estrategias y ajustando el enfoque, lo que activa áreas cerebrales vinculadas a la autoconciencia."},
-    {"function": "Pensamiento Crítico y Creativo", "description": "Al analizar, evaluar, comparar y crear, se activan redes cerebrales complejas que integran lógica, razonamiento y generación de nuevas ideas."}
-  ],
-  "ethicalPrinciples": [
-      "Transparencia: Ser claro sobre cuándo y cómo se está utilizando la IA.",
-      "Justicia y Equidad: Asegurarse de que el uso de la IA no perpetúe sesgos ni cree desventajas para ciertos grupos.",
-      "Responsabilidad y Supervisión Humana: Mantener siempre el control humano final sobre las decisiones y los productos generados.",
-      "Privacidad y Seguridad de los Datos: Proteger la información personal y los datos que se introducen en las herramientas de IA.",
-      "Honestidad Académica y Atribución: Citar y declarar adecuadamente el uso de la IA, distinguiendo el trabajo propio del generado por la herramienta."
+    {"function": "Atención Selectiva", "description": "La actividad requiere que los estudiantes se enfoquen en información relevante, filtrando distracciones."},
+    {"function": "Memoria de Trabajo", "description": "Los estudiantes deben mantener y manipular información a corto plazo para completar la tarea."},
+    {"function": "Codificación y Consolidación", "description": "Al conectar nueva información con conocimientos previos, se fortalecen las conexiones sinápticas."},
+    {"function": "Funciones Ejecutivas", "description": "La actividad exige planificar pasos, organizar ideas y monitorear el propio progreso."},
+    {"function": "Metacognición", "description": "Se fomenta la reflexión sobre el propio proceso de aprendizaje, evaluando estrategias y ajustando el enfoque."},
+    {"function": "Pensamiento Crítico y Creativo", "description": "Al analizar, evaluar y crear, se activan redes cerebrales complejas que integran lógica y nuevas ideas."}
   ]
 }
