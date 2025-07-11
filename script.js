@@ -95,7 +95,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const career = document.getElementById('career-select').value;
         const subject = document.getElementById('subject-input').value;
 
-        // Validación para asegurar que los campos no estén vacíos antes de la llamada
         if (!career || !subject) {
             container.innerHTML = `<p style="color:red;">Por favor, regresa y asegúrate de haber seleccionado una carrera y escrito una materia.</p>`;
             return;
@@ -107,23 +106,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ career, subject })
             });
-            if (!response.ok) throw new Error('Respuesta no válida del servidor.');
-
-            // --- INICIO DE LA CORRECCIÓN CLAVE ---
-            // Leemos la respuesta como texto plano primero
-            const responseText = await response.text();
-            let examples;
-            
-            // Intentamos "limpiar" y parsear el texto
-            try {
-                // Esto elimina los ```json y ``` que la IA a veces añade
-                const cleanText = responseText.replace(/^```json\n/, '').replace(/\n```$/, '');
-                examples = JSON.parse(cleanText);
-            } catch (parseError) {
-                console.error("Error al parsear la respuesta de la IA:", responseText);
-                throw new Error("La IA devolvió un formato de respuesta inesperado.");
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({error: 'Respuesta no válida del servidor.'}));
+                throw new Error(errorData.error);
             }
-            // --- FIN DE LA CORRECCIÓN CLAVE ---
+
+            const examples = await response.json();
             
             let tableHTML = '<table class="rubric-table">';
             tableHTML += '<thead><tr><th>Dominio</th><th>Niveles (de simple a complejo)</th><th>Ejemplo de Objetivo</th></tr></thead><tbody>';
@@ -234,7 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         const sourceHTML = source.innerHTML;
-        const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Actividad</title></head><body>";
+        const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='[http://www.w3.org/TR/REC-html40](http://www.w3.org/TR/REC-html40)'><head><meta charset='utf-8'><title>Actividad</title></head><body>";
         const footer = "</body></html>";
         const fullHTML = header + sourceHTML + footer;
         const blob = new Blob(['\ufeff', fullHTML], {
