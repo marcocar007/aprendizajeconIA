@@ -6,18 +6,14 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 exports.handler = async function (event, context) {
-  // Solo permite peticiones POST
   if (event.httpMethod !== "POST") {
     return { statusCode: 405, body: "Method Not Allowed" };
   }
 
   try {
-    // Parsea los datos enviados desde el frontend
     const userData = JSON.parse(event.body);
-
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    // --- Creación del Prompt Optimizado para Gemini ---
     const prompt = `
       Actúa como un diseñador instruccional experto y creativo, especializado en educación superior.
       Tu tarea es generar UNA propuesta de actividad de aprendizaje detallada, basada en los siguientes datos proporcionados por un docente:
@@ -32,7 +28,7 @@ exports.handler = async function (event, context) {
       - Restricciones o especificaciones: ${userData.restrictions || "Ninguna."}
       - Uso de IA por parte de los estudiantes: ${userData.useAI === "si" ? `Sí, usando el marco ${userData.aiFramework}, nivel ${userData.aiLevel}.` : "No, la actividad no debe usar IA."}
 
-      Basado en los datos anteriores y aprovechando tu conocimiento sobre pedagogía, genera la actividad con el siguiente formato EXACTO, usando markdown:
+      Basado en los datos anteriores y aprovechando tu conocimiento sobre pedagogía, genera la actividad con el siguiente formato EXACTO:
 
       ### **NOMBRE CREATIVO DE LA ACTIVIDAD**
       *Aquí un nombre atractivo y relevante para la actividad.*
@@ -66,7 +62,7 @@ exports.handler = async function (event, context) {
     console.error("Error al llamar a la API de Gemini:", error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: "Hubo un error al generar la actividad." }),
+      body: JSON.stringify({ error: "Hubo un error al generar la actividad. Revisa la API Key y la configuración del servidor." }),
     };
   }
 };
