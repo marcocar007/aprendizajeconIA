@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentStep = 1;
     let dbData = {};
     const userData = {};
+    let generatedProposals = []; // Almacenará las propuestas de la IA
 
     function init() {
         fetch('database.json')
@@ -10,8 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 dbData = data;
                 populateCareers();
                 setupEventListeners();
-            })
-            .catch(error => console.error('Error al cargar database.json:', error));
+            });
     }
 
     function showStep(stepNumber) {
@@ -27,13 +27,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function setupEventListeners() {
         document.getElementById('start-btn').addEventListener('click', () => showStep(2));
-        document.querySelectorAll('.next-btn').forEach(button => button.addEventListener('click', () => showStep(currentStep + 1)));
+        document.querySelectorAll('.next-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                if (validateCurrentStep()) {
+                    showStep(currentStep + 1);
+                }
+            });
+        });
         document.querySelectorAll('.prev-btn').forEach(button => {
             if (currentStep > 1) showStep(currentStep - 1);
         });
-        document.getElementById('generate-activity-btn').addEventListener('click', generateActivityWithAI);
-        document.getElementById('finish-btn').addEventListener('click', () => showStep(12));
+        document.getElementById('generate-proposals-btn').addEventListener('click', generateProposalsWithAI);
+        document.getElementById('finish-btn').addEventListener('click', () => showStep(13));
         document.getElementById('start-over-btn').addEventListener('click', () => location.reload());
+        document.getElementById('back-to-proposals-btn').addEventListener('click', () => showStep(11));
         document.querySelectorAll('input[name="use-ai"]').forEach(radio => {
             radio.addEventListener('change', (event) => {
                 const isAISelected = event.target.value === 'si';
@@ -46,6 +53,19 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('download-word-btn').addEventListener('click', downloadActivityAsWord);
     }
     
+    function validateCurrentStep() {
+        const currentStepDiv = document.getElementById(`step-${currentStep}`);
+        const inputs = currentStepDiv.querySelectorAll('input[required], textarea[required]');
+        for (const input of inputs) {
+            if (!input.value.trim()) {
+                alert('Por favor, completa todos los campos obligatorios para continuar.');
+                input.focus();
+                return false;
+            }
+        }
+        return true;
+    }
+
     function captureAllUserData() {
         userData.career = document.getElementById('career-select').value;
         userData.subject = document.getElementById('subject-input').value;
@@ -63,15 +83,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    async function generateActivityWithAI() {
+    async function generateProposalsWithAI() {
         captureAllUserData();
-        if (!userData.objective || !userData.subject) {
-            alert("Por favor, asegúrate de haber completado el nombre de la asignatura y el objetivo de aprendizaje.");
-            return;
-        }
         showStep(11);
-        const outputDiv = document.getElementById('final-activity-output');
-        outputDiv.innerHTML = '<div class="loading-spinner"></div><p>Conectando con la IA para generar tu actividad... Esto puede tardar unos segundos.</p>';
+        document.getElementById('proposals-container').classList.add('hidden');
+        document.getElementById('proposals-loading').classList.remove('hidden');
 
         try {
             const response = await fetch('/.netlify/functions/generateActivity', {
@@ -79,46 +95,78 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(userData)
             });
-            if (!response.ok) throw new Error(`El servidor respondió con un error: ${response.statusText}`);
+            if (!response.ok) throw new Error(`El servidor respondió con un error.`);
             
             const data = await response.json();
             if (data.error) throw new Error(data.error);
 
-            // Usamos una librería (marcada en el HTML) o una función para convertir Markdown a HTML
-            // Como no tenemos una, hacemos un reemplazo simple para la demo.
-            const formattedHtml = data.activity
-                .replace(/### \*\*(.*?)\*\*/g, '<h3>$1</h3>') // ### **TITLE** -> <h3>TITLE</h3>
-                .replace(/### (.*?)/g, '<h3>$1</h3>')       // ### TITLE -> <h3>TITLE</h3>
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // **bold** -> <strong>bold</strong>
-                .replace(/\*(.*?)\*/g, '<em>$1</em>')         // *italic* -> <em>italic</em>
-                .replace(/^\* (.*$)/gm, '<li>$1</li>')       // * list item -> <li>list item</li>
-                .replace(/\n/g, '<br>');
-
-            outputDiv.innerHTML = `<div>${formattedHtml}</div>`;
+            generatedProposals = data.proposals;
+            displayProposals();
 
         } catch (error) {
-            console.error('Error:', error);
-            outputDiv.innerHTML = `<p style="color: red;">Lo sentimos, ocurrió un error: ${error.message}. Por favor, revisa la configuración e intenta de nuevo.</p>`;
+            document.getElementById('proposals-container').innerHTML = `<p style="color: red;">Lo sentimos, ocurrió un error: ${error.message}. Por favor, revisa la configuración e intenta de nuevo.</p>`;
+        } finally {
+            document.getElementById('proposals-container').classList.remove('hidden');
+            document.getElementById('proposals-loading').classList.add('hidden');
         }
     }
 
+    function displayProposals() {
+        const container = document.getElementById('proposals-container');
+        container.innerHTML = '';
+        generatedProposals.forEach((proposal, index) => {
+            const title = proposal.match(/# (.*)/)?.[1] || `Propuesta ${index + 1}`;
+            const description = proposal.match(/\* (.*)/)?.[1] || "Una propuesta de actividad creativa.";
+            
+            const proposalDiv = document.createElement('div');
+            proposalDiv.className = 'proposal';
+            proposalDiv.innerHTML = `
+                <h4>${title}</h4>
+                <p>${description}</p>
+                <button class="select-proposal-btn" data-index="${index}">Elegir esta actividad</button>
+            `;
+            container.appendChild(proposalDiv);
+        });
+        
+        document.querySelectorAll('.select-proposal-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const selectedIndex = e.target.dataset.index;
+                displayFinalActivity(selectedIndex);
+            });
+        });
+    }
+
+    function displayFinalActivity(index) {
+        const finalActivityHTML = window.marked.parse(generatedProposals[index]);
+        document.getElementById('final-activity-output').innerHTML = finalActivityHTML;
+        showStep(12);
+    }
+
     function populateBloomExamples() {
-        const container = document.getElementById('bloom-examples-container');
-        if (!dbData.bloomTaxonomy) return;
+        const container = document.getElementById('bloom-table-container');
+        const introContainer = document.getElementById('bloom-intro-text');
+        if (!dbData.bloomTaxonomy || container.innerHTML.trim() !== '') return;
+
+        introContainer.innerHTML = `<p>Para que un objetivo sea efectivo, debe ser claro y medible. La Taxonomía de Bloom nos ayuda a estructurarlo, organizando el aprendizaje en tres dominios: <strong>Cognitivo</strong> (el saber), <strong>Afectivo</strong> (el ser) y <strong>Psicomotor</strong> (el hacer). Dentro de cada dominio, los niveles van de acciones simples a complejas, asegurando un aprendizaje progresivo y profundo.</p>`;
+        
         let tableHTML = '<table class="rubric-table">';
-        tableHTML += '<thead><tr><th>Dominio</th><th>Nivel de Ejemplo</th><th>Verbos Clave</th><th>Ejemplo de Objetivo (Verbo+Contenido+Propósito)</th></tr></thead><tbody>';
+        tableHTML += '<thead><tr><th>Dominio</th><th>Niveles (de simple a complejo)</th><th>Ejemplo de Objetivo</th></tr></thead><tbody>';
         
         for (const domainKey in dbData.bloomTaxonomy) {
             const domain = dbData.bloomTaxonomy[domainKey];
-            const randomLevelIndex = Math.floor(Math.random() * domain.levels.length);
-            const level = domain.levels[randomLevelIndex];
-            const randomExample = level.examples[Math.floor(Math.random() * level.examples.length)];
+            const randomLevel = domain.levels[Math.floor(Math.random() * domain.levels.length)];
+            const randomExample = randomLevel.examples[Math.floor(Math.random() * randomLevel.examples.length)];
+            
+            let levelsList = '<ul>';
+            domain.levels.forEach(level => {
+                levelsList += `<li>${level.name}</li>`;
+            });
+            levelsList += '</ul>';
 
             tableHTML += `<tr>
                 <td><strong>${domain.name}</strong></td>
-                <td>${level.name}</td>
-                <td><em>${level.verbs.join(', ')}</em></td>
-                <td>«${randomExample}»</td>
+                <td>${levelsList}</td>
+                <td><strong>Ejemplo (Nivel: ${randomLevel.name}):</strong><br><em>«${randomExample}»</em></td>
             </tr>`;
         }
         tableHTML += '</tbody></table>';
@@ -130,26 +178,29 @@ document.addEventListener('DOMContentLoaded', () => {
         const source = document.getElementById('final-activity-output');
         if (!source) return;
         
-        html2canvas(source, { scale: 2, useCORS: true }).then(canvas => {
-            const imgData = canvas.toDataURL('image/png');
-            const pdf = new jsPDF('p', 'pt', 'letter');
-            const imgProps = pdf.getImageProperties(imgData);
-            const pdfWidth = pdf.internal.pageSize.getWidth() - 40;
-            const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-            pdf.addImage(imgData, 'PNG', 20, 20, pdfWidth, pdfHeight);
-            pdf.save('actividad_generada.pdf');
+        const pdf = new jsPDF({ orientation: 'p', unit: 'pt', format: 'letter' });
+        
+        // Usamos el método html de jsPDF que funciona mejor con html2canvas
+        pdf.html(source, {
+            callback: function(doc) {
+                doc.save('actividad_generada.pdf');
+            },
+            x: 15,
+            y: 15,
+            width: 565, // Ancho para una página tamaño carta con márgenes
+            windowWidth: source.scrollWidth
         });
     }
     
     function downloadActivityAsWord() {
         const sourceHTML = document.getElementById('final-activity-output').innerHTML;
-        const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Actividad de Aprendizaje</title></head><body>";
+        const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Actividad</title></head><body>";
         const footer = "</body></html>";
         const source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(header + sourceHTML + footer);
         const fileDownload = document.createElement("a");
         document.body.appendChild(fileDownload);
         fileDownload.href = source;
-        fileDownload.download = 'actividad_de_aprendizaje.doc';
+        fileDownload.download = 'actividad_generada.doc';
         fileDownload.click();
         document.body.removeChild(fileDownload);
     }
@@ -188,8 +239,8 @@ document.addEventListener('DOMContentLoaded', () => {
         
         framework.levels.forEach(level => {
             const option = document.createElement('option');
-            option.value = level.name; // Usar el nombre para el prompt
-            option.textContent = `${frameworkKey === 'go8' ? '' : 'Nivel ' + level.level + ': '}${level.name}`;
+            option.value = level.name;
+            option.textContent = `${frameworkKey === 'go8' ? '' : 'Nivel ' + (level.level || '') + ': '}${level.name}`;
             levelSelect.appendChild(option);
         });
     }
