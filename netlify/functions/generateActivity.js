@@ -2,7 +2,6 @@
 
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
-// Trae la API Key de las variables de entorno seguras de Netlify
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 exports.handler = async function (event, context) {
@@ -14,39 +13,61 @@ exports.handler = async function (event, context) {
     const userData = JSON.parse(event.body);
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
+    // --- PROMPT MEJORADO PARA GENERAR DOS PROPUESTAS ---
     const prompt = `
-      Actúa como un diseñador instruccional experto y creativo, especializado en educación superior.
-      Tu tarea es generar UNA propuesta de actividad de aprendizaje detallada, basada en los siguientes datos proporcionados por un docente:
+      Actúa como un diseñador instruccional experto y creativo. Tu tarea es generar DOS propuestas de actividad de aprendizaje distintas y completas, basadas en los siguientes datos del docente. Utiliza dos enfoques pedagógicos diferentes (ej. uno constructivista y otro basado en proyectos).
 
+      **Datos del Docente:**
       - Carrera: ${userData.career}
       - Asignatura: ${userData.subject}
-      - Objetivo de Aprendizaje del Docente: "${userData.objective}"
-      - Contexto de los Estudiantes: ${userData.studentContext}
+      - Objetivo de Aprendizaje: "${userData.objective}"
+      - Contexto: ${userData.studentContext}
       - Modalidad: ${userData.modality}
-      - Duración de la Actividad: ${userData.duration}
+      - Duración: ${userData.duration}
       - Tipo de trabajo: ${userData.workType}
-      - Restricciones o especificaciones: ${userData.restrictions || "Ninguna."}
-      - Uso de IA por parte de los estudiantes: ${userData.useAI === "si" ? `Sí, usando el marco ${userData.aiFramework}, nivel ${userData.aiLevel}.` : "No, la actividad no debe usar IA."}
+      - Restricciones: ${userData.restrictions || "Ninguna."}
+      - Uso de IA por Estudiantes: ${userData.useAI === "si" ? `Sí, usando el marco ${userData.aiFramework}, nivel "${userData.aiLevel}".` : "No, la actividad no debe usar IA."}
+      - Información Adicional: ${userData.extraInfo || "Ninguna."}
 
-      Basado en los datos anteriores y aprovechando tu conocimiento sobre pedagogía, genera la actividad con el siguiente formato EXACTO:
-
-      ### **NOMBRE CREATIVO DE LA ACTIVIDAD**
-      *Aquí un nombre atractivo y relevante para la actividad.*
-
-      ### **Descripción General**
-      *Aquí una descripción concisa de la actividad en uno o dos párrafos.*
-
-      ### **Pasos a Seguir**
-      *Aquí una lista numerada y detallada de los pasos que el docente y los estudiantes deben seguir. Sé claro y práctico.*
+      **Formato de Salida Obligatorio:**
+      Genera la primera propuesta. Luego, escribe una línea que contenga únicamente "---PROPUESTA_DIVISOR---". Finalmente, genera la segunda propuesta.
       
-      ### **Sustento Pedagógico**
-      *Aquí explica brevemente el sustento pedagógico (puedes inspirarte en teóricos como Piaget, Vygotsky, Dewey, etc.) y especifica si la actividad está centrada en el estudiante o en el objeto de estudio, explicando por qué.*
+      Para CADA una de las dos propuestas, sigue esta estructura de Markdown EXACTA:
 
-      ### **Función Cerebral Aprovechada**
-      *Aquí describe qué funciones cerebrales clave (memoria de trabajo, pensamiento crítico, creatividad, etc.) se activan con esta actividad.*
+      # TÍTULO CREATIVO DE LA PROPUESTA
+      *Una descripción muy breve de una línea sobre el enfoque de la actividad.*
+      ---
+      ### Objetivo de Aprendizaje
+      *Reformula el objetivo del docente para que se alinee con esta actividad específica.*
+
+      ### Sustento Pedagógico
+      *Explica el enfoque pedagógico (ej. 'Aprendizaje Basado en Problemas') y por qué está centrado en el estudiante o en el objeto de estudio.*
       
-      ### **Rúbrica de Evaluación Sugerida**
-      *Aquí una tabla simple en markdown con 3 o 4 criterios de evaluación y su descripción. Si se usa IA, incluye un criterio sobre el uso ético de la misma.*
+      ### Tipo de Uso de la IA
+      *${userData.useAI === "si" 
+        ? `Describe cómo se usará la IA según el nivel "${userData.aiLevel}". Menciona qué aspecto se aprovechará (ej. 'Generación de texto para brainstorming', 'Análisis de datos con machine learning', etc.).`
+        : "Esta actividad está diseñada para realizarse sin el uso de herramientas de IA generativa, fomentando el pensamiento original y la resolución de problemas sin asistencia."
+      }*
+
+      ### Función Cerebral Aprovechada
+      *Describe qué funciones cerebrales clave (ej. memoria de trabajo, pensamiento crítico) se activan.*
+
+      ### Descripción General
+      *Un párrafo que explica en qué consiste la actividad.*
+
+      ### Pasos a Seguir
+      1.  **Paso 1:** Detalle claro y conciso.
+      2.  **Paso 2:** Detalle claro y conciso.
+      3.  **Paso 3:** Y así sucesivamente.
+
+      ### Rúbrica de Evaluación
+      | Criterio | Descripción | Ponderación |
+      | :--- | :--- | :--- |
+      | Comprensión del Tema | Demuestra un entendimiento profundo del objetivo. | 40% |
+      | Aplicación Práctica | Aplica los conceptos de manera efectiva en la tarea. | 30% |
+      | Calidad de la Presentación | El resultado final es claro, organizado y profesional. | 15% |
+      | ${userData.workType === 'En equipo' ? 'Colaboración' : 'Originalidad'} | ${userData.workType === 'En equipo' ? 'Trabaja eficazmente con sus compañeros.' : 'El trabajo muestra un pensamiento propio y creativo.'} | 15% |
+      ${userData.useAI === "si" ? "| Uso Ético de la IA | Cita y utiliza la IA de acuerdo a las pautas. | (Se evalúa dentro de otros criterios) |\n" : ""}
     `;
 
     const result = await model.generateContent(prompt);
@@ -55,14 +76,14 @@ exports.handler = async function (event, context) {
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ activity: text }),
+      body: JSON.stringify({ proposals: text.split('---PROPUESTA_DIVISOR---') }),
     };
 
   } catch (error) {
-    console.error("Error al llamar a la API de Gemini:", error);
+    console.error("Error en la función de Netlify:", error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: "Hubo un error al generar la actividad. Revisa la API Key y la configuración del servidor." }),
+      body: JSON.stringify({ error: "Hubo un error al contactar la IA. Por favor, revisa la API Key y la configuración." }),
     };
   }
 };
