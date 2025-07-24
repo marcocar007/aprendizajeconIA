@@ -6,11 +6,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function init() {
         fetch('database.json')
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                return response.json();
+            })
             .then(data => {
                 dbData = data;
                 populateCareers();
                 setupEventListeners();
+            })
+            .catch(error => {
+                console.error('Error Crítico: No se pudo cargar o parsear database.json.', error);
+                const appContainer = document.getElementById('app-container');
+                if(appContainer) appContainer.innerHTML = `<p style="color:red; text-align:center;"><b>Error fatal:</b> No se pudo cargar la base de datos de la aplicación (database.json).<br>Por favor, revisa que el archivo exista en el repositorio y no tenga errores de sintaxis.</p>`;
             });
     }
 
@@ -26,12 +34,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function setupEventListeners() {
-        // --- FUNCIÓN DE AYUDA PARA AÑADIR LISTENERS DE FORMA SEGURA ---
         const safeAddListener = (id, event, handler) => {
             const element = document.getElementById(id);
-            if (element) {
-                element.addEventListener(event, handler);
-            }
+            if (element) element.addEventListener(event, handler);
         };
 
         safeAddListener('start-btn', 'click', () => showStep(2));
@@ -133,7 +138,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function populateCareers() {
-        // ... (resto del código sin cambios)
+        const careerSelect = document.getElementById('career-select');
+        dbData.careers.forEach(career => {
+            const option = document.createElement('option');
+            option.value = career.name;
+            option.textContent = career.name;
+            careerSelect.appendChild(option);
+        });
     }
 
     function populateAIFrameworks() {
