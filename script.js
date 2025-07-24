@@ -1,11 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- VARIABLES GLOBALES ---
     let currentStep = 1;
     let dbData = {};
     const userData = {};
     let generatedProposals = [];
 
-    // --- INICIALIZACIÓN DE LA APLICACIÓN ---
     function init() {
         fetch('database.json')
             .then(response => response.json())
@@ -16,7 +14,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     }
 
-    // --- NAVEGACIÓN ENTRE PASOS ---
     function showStep(stepNumber) {
         document.querySelectorAll('.step').forEach(step => step.classList.remove('active'));
         const nextStepElement = document.getElementById(`step-${stepNumber}`);
@@ -28,9 +25,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- CONFIGURACIÓN DE EVENTOS (VERSIÓN SIMPLIFICADA Y CORREGIDA) ---
     function setupEventListeners() {
-        document.getElementById('start-btn').addEventListener('click', () => showStep(2));
+        // --- FUNCIÓN DE AYUDA PARA AÑADIR LISTENERS DE FORMA SEGURA ---
+        const safeAddListener = (id, event, handler) => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener(event, handler);
+            }
+        };
+
+        safeAddListener('start-btn', 'click', () => showStep(2));
         
         document.querySelectorAll('.next-btn').forEach(button => {
             button.addEventListener('click', () => {
@@ -48,11 +52,11 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
         
-        document.getElementById('generate-proposals-btn').addEventListener('click', generateProposalsWithAI);
-        document.getElementById('regenerate-proposals-btn').addEventListener('click', generateProposalsWithAI);
-        document.getElementById('finish-btn').addEventListener('click', () => showStep(13));
-        document.getElementById('start-over-btn').addEventListener('click', () => location.reload());
-        document.getElementById('back-to-proposals-btn').addEventListener('click', () => showStep(11));
+        safeAddListener('generate-proposals-btn', 'click', generateProposalsWithAI);
+        safeAddListener('regenerate-proposals-btn', 'click', generateProposalsWithAI);
+        safeAddListener('finish-btn', 'click', () => showStep(13));
+        safeAddListener('start-over-btn', 'click', () => location.reload());
+        safeAddListener('back-to-proposals-btn', 'click', () => showStep(11));
         
         document.querySelectorAll('input[name="use-ai"]').forEach(radio => {
             radio.addEventListener('change', (event) => {
@@ -62,10 +66,10 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
         
-        document.getElementById('ai-framework-select').addEventListener('change', populateAILevelSelect);
-        document.getElementById('download-pdf-btn').addEventListener('click', downloadActivityAsPDF);
-        document.getElementById('download-word-btn').addEventListener('click', downloadActivityAsWord);
-        document.getElementById('file-upload').addEventListener('change', handleFileUpload);
+        safeAddListener('ai-framework-select', 'change', populateAILevelSelect);
+        safeAddListener('download-pdf-btn', 'click', downloadActivityAsPDF);
+        safeAddListener('download-word-btn', 'click', downloadActivityAsWord);
+        safeAddListener('file-upload', 'change', handleFileUpload);
     }
     
     function validateCurrentStep() {
