@@ -1,27 +1,140 @@
-/* ... (Todo el CSS anterior) ... */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
-/* CAMBIO DE COLOR PRINCIPAL */
+body {
+    font-family: 'Roboto', sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 20px;
+    background-color: #f4f4f4;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+header {
+    width: 100%;
+    max-width: 800px;
+    text-align: center;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 10px;
+}
+
 header h1 {
-    color: #000000; /* Negro en lugar de verde */
+    color: #000000;
+    margin: 0;
 }
+
+.subtitle {
+    font-size: 1.1em;
+    color: #555;
+    margin: 5px 0;
+}
+
+.author {
+    color: #666;
+    font-size: 0.9em;
+}
+
+.author a {
+    color: #333;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.author a:hover {
+    text-decoration: underline;
+}
+
+#app-container {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    padding: 30px;
+    width: 100%;
+    max-width: 800px;
+}
+
+/* --- REGLA CLAVE PARA OCULTAR Y MOSTRAR PASOS --- */
+.step {
+    display: none;
+}
+
+.step.active {
+    display: block;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
 h2, h3 {
-    color: #333333; /* Gris oscuro en lugar de verde */
-    border-bottom-color: #e0e0e0;
+    color: #333333;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 5px;
+    margin-top: 0;
 }
+
+label {
+    display: block;
+    font-weight: bold;
+    margin-top: 15px;
+    margin-bottom: 5px;
+}
+
+input[type="text"],
+input[type="file"],
+textarea,
+select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    margin-bottom: 15px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 1em;
+}
+
+.navigation-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
 button {
-    background-color: #444444; /* Gris oscuro para botones */
+    background-color: #222222; /* Negro/Gris oscuro */
+    color: #ffffff; /* --- TEXTO BLANCO (CORREGIDO) --- */
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
 }
+
 button:hover {
     background-color: #000000; /* Negro al pasar el mouse */
 }
+
+button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
 .prev-btn {
     background-color: #666666; /* Gris medio */
 }
+
 .prev-btn:hover {
     background-color: #555555;
 }
 
-/* ESTILOS PARA EL TOOLTIP */
+/* Estilos para el tooltip */
 .tooltip-container {
     position: relative;
     display: inline-block;
@@ -29,51 +142,34 @@ button:hover {
     margin: 15px 0;
 }
 .tooltip-icon {
-    width: 24px;
-    height: 24px;
-    background-color: #444;
-    color: white;
+    width: 24px; height: 24px;
+    background-color: #444; color: white;
     border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: flex; align-items: center; justify-content: center;
     font-weight: bold;
 }
 .tooltip-text {
-    visibility: hidden;
-    width: 300px;
-    background-color: #333;
-    color: #fff;
-    text-align: left;
-    border-radius: 6px;
-    padding: 10px;
-    position: absolute;
-    z-index: 1;
-    bottom: 125%;
-    left: 50%;
-    margin-left: -150px;
-    opacity: 0;
+    visibility: hidden; width: 300px;
+    background-color: #333; color: #fff;
+    text-align: left; border-radius: 6px;
+    padding: 10px; position: absolute;
+    z-index: 1; bottom: 125%; left: 50%;
+    margin-left: -150px; opacity: 0;
     transition: opacity 0.3s;
 }
 .tooltip-text h4 {
-    color: #fff;
-    border-bottom: 1px solid #777;
-    margin-top: 0;
-    padding-bottom: 5px;
+    color: #fff; border-bottom: 1px solid #777;
+    margin-top: 0; padding-bottom: 5px;
 }
-.tooltip-text p {
-    font-size: 0.9em;
-}
+.tooltip-text p { font-size: 0.9em; }
 .tooltip-container:hover .tooltip-text {
-    visibility: visible;
-    opacity: 1;
+    visibility: visible; opacity: 1;
 }
 
-/* ESTILOS PARA LA ANIMACIÓN DE CARGA (Reloj de Arena) */
+/* Estilos para la animación de carga */
 .loading-spinner {
     display: inline-block;
-    width: 20px;
-    height: 20px;
+    width: 20px; height: 20px;
     border: 3px solid #f3f3f3;
     border-top: 3px solid #343434;
     border-radius: 50%;
@@ -89,25 +185,37 @@ button:hover {
     display: inline-block;
     vertical-align: middle;
 }
-.hidden {
-    display: none !important;
-}
+.hidden { display: none !important; }
 
-/* Ajustes adicionales de la interfaz */
-.subtitle {
-    font-size: 1.1em;
-    color: #555;
-}
-.author a {
-    color: #333;
-    text-decoration: none;
-}
-.author a:hover {
-    text-decoration: underline;
-}
-.upload-label {
-    font-weight: bold;
+/* Estilos para tablas y propuestas */
+.rubric-table {
+    width: 100%;
+    border-collapse: collapse;
     margin-top: 15px;
+}
+.rubric-table th, .rubric-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+    vertical-align: top;
+}
+.rubric-table th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
+.proposal {
+    border: 1px solid #ddd;
+    padding: 20px;
+    margin-top: 20px;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+#final-activity-output {
+    border: 1px solid #ddd;
+    padding: 20px;
+    margin-top: 20px;
+    border-radius: 5px;
+    background-color: #fff;
 }
 .upload-note {
     font-size: 0.8em;
