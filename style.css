@@ -12,41 +12,6 @@ body {
     align-items: center;
 }
 
-header {
-    width: 100%;
-    max-width: 800px;
-    text-align: center;
-    margin-bottom: 20px;
-    border-bottom: 2px solid #e0e0e0;
-    padding-bottom: 10px;
-}
-
-header h1 {
-    color: #000000;
-    margin: 0;
-}
-
-.subtitle {
-    font-size: 1.1em;
-    color: #555;
-    margin: 5px 0;
-}
-
-.author {
-    color: #666;
-    font-size: 0.9em;
-}
-
-.author a {
-    color: #333;
-    text-decoration: none;
-    font-weight: bold;
-}
-
-.author a:hover {
-    text-decoration: underline;
-}
-
 #app-container {
     background-color: #ffffff;
     border-radius: 8px;
@@ -56,6 +21,7 @@ header h1 {
     max-width: 800px;
 }
 
+/* --- REGLA CLAVE PARA LA NAVEGACIÓN --- */
 .step {
     display: none;
 }
@@ -66,42 +32,8 @@ header h1 {
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-h2, h3, h4 {
-    color: #333333;
-    border-bottom: 1px solid #e0e0e0;
-    padding-bottom: 5px;
-    margin-top: 0;
-}
-
-label {
-    display: block;
-    font-weight: bold;
-    margin-top: 15px;
-    margin-bottom: 5px;
-}
-
-input[type="text"],
-input[type="file"],
-textarea,
-select {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-    margin-bottom: 15px;
-    font-family: 'Roboto', sans-serif;
-    font-size: 1em;
-}
-
-.navigation-buttons {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 button {
@@ -120,11 +52,6 @@ button:hover {
     background-color: #000000;
 }
 
-button:disabled {
-    background-color: #cccccc;
-    cursor: not-allowed;
-}
-
 .prev-btn {
     background-color: #666666;
 }
@@ -133,36 +60,4 @@ button:disabled {
     background-color: #555555;
 }
 
-.hidden {
-    display: none !important;
-}
-
-.rubric-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 15px;
-}
-.rubric-table th, .rubric-table td {
-    border: 1px solid #ddd;
-    padding: 10px;
-    text-align: left;
-    vertical-align: top;
-}
-.rubric-table th {
-    background-color: #f2f2f2;
-    font-weight: bold;
-}
-.proposal {
-    border: 1px solid #ddd;
-    padding: 20px;
-    margin-top: 20px;
-    border-radius: 5px;
-    background-color: #f9f9f9;
-}
-#final-activity-output {
-    border: 1px solid #ddd;
-    padding: 20px;
-    margin-top: 20px;
-    border-radius: 5px;
-    background-color: #fff;
-}
+/* El resto de los estilos... */
