@@ -56,7 +56,7 @@ header h1 {
     max-width: 800px;
 }
 
-/* --- REGLA CLAVE PARA OCULTAR Y MOSTRAR PASOS --- */
+/* --- REGLA CLAVE RESTAURADA --- */
 .step {
     display: none;
 }
@@ -71,7 +71,7 @@ header h1 {
     to { opacity: 1; transform: translateY(0); }
 }
 
-h2, h3 {
+h2, h3, h4 {
     color: #333333;
     border-bottom: 1px solid #e0e0e0;
     padding-bottom: 5px;
@@ -106,8 +106,8 @@ select {
 }
 
 button {
-    background-color: #222222; /* Negro/Gris oscuro */
-    color: #ffffff; /* --- TEXTO BLANCO (CORREGIDO) --- */
+    background-color: #222222;
+    color: #ffffff;
     padding: 12px 20px;
     border: none;
     border-radius: 4px;
@@ -118,7 +118,7 @@ button {
 }
 
 button:hover {
-    background-color: #000000; /* Negro al pasar el mouse */
+    background-color: #000000;
 }
 
 button:disabled {
@@ -127,7 +127,7 @@ button:disabled {
 }
 
 .prev-btn {
-    background-color: #666666; /* Gris medio */
+    background-color: #666666;
 }
 
 .prev-btn:hover {
@@ -163,7 +163,8 @@ button:disabled {
 }
 .tooltip-text p { font-size: 0.9em; }
 .tooltip-container:hover .tooltip-text {
-    visibility: visible; opacity: 1;
+    visibility: visible;
+    opacity: 1;
 }
 
 /* Estilos para la animación de carga */
@@ -177,13 +178,16 @@ button:disabled {
     margin-right: 10px;
     vertical-align: middle;
 }
+.loading-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    color: #666;
+}
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
-}
-.loading-text {
-    display: inline-block;
-    vertical-align: middle;
 }
 .hidden { display: none !important; }
 
