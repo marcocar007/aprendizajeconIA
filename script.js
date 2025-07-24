@@ -6,11 +6,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function init() {
         fetch('database.json')
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                return response.json();
+            })
             .then(data => {
                 dbData = data;
                 populateCareers();
                 setupEventListeners();
+            })
+            .catch(error => {
+                console.error('Error Crítico al cargar database.json:', error);
+                const appContainer = document.getElementById('app-container');
+                if(appContainer) appContainer.innerHTML = `<p style="color:red; text-align:center;"><b>Error fatal:</b> No se pudo cargar la base de datos (database.json).</p>`;
             });
     }
 
@@ -46,8 +54,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         
         safeAddListener('generate-proposals-btn', 'click', generateProposalsWithAI);
-        // --- LÍNEA PROBLEMÁTICA ELIMINADA ---
-        // safeAddListener('regenerate-proposals-btn', 'click', generateProposalsWithAI);
         safeAddListener('finish-btn', 'click', () => showStep(13));
         safeAddListener('start-over-btn', 'click', () => location.reload());
         safeAddListener('back-to-proposals-btn', 'click', () => showStep(11));
@@ -63,10 +69,19 @@ document.addEventListener('DOMContentLoaded', () => {
         safeAddListener('ai-framework-select', 'change', populateAILevelSelect);
         safeAddListener('download-pdf-btn', 'click', downloadActivityAsPDF);
         safeAddListener('download-word-btn', 'click', downloadActivityAsWord);
-        safeAddListener('file-upload', 'change', handleFileUpload);
     }
     
-    // ... (El resto de las funciones no cambian)
+    function validateCurrentStep() { /* ... código sin cambios ... */ }
+    function captureAllUserData() { /* ... código sin cambios ... */ }
+    async function generateAndPopulateBloomExamples() { /* ... código sin cambios ... */ }
+    async function generateProposalsWithAI() { /* ... código sin cambios ... */ }
+    function displayProposals() { /* ... código sin cambios ... */ }
+    function displayFinalActivity(index) { /* ... código sin cambios ... */ }
+    function downloadActivityAsPDF() { /* ... código sin cambios ... */ }
+    function downloadActivityAsWord() { /* ... código sin cambios ... */ }
+    function populateCareers() { /* ... código sin cambios ... */ }
+    function populateAIFrameworks() { /* ... código sin cambios ... */ }
+    function populateAILevelSelect() { /* ... código sin cambios ... */ }
 
     init();
 });
