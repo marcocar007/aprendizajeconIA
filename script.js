@@ -72,17 +72,134 @@ document.addEventListener('DOMContentLoaded', () => {
         safeAddListener('download-word-btn', 'click', downloadActivityAsWord);
     }
     
-    function validateCurrentStep() { /* ... código sin cambios ... */ }
-    function captureAllUserData() { /* ... código sin cambios ... */ }
-    async function generateAndPopulateBloomExamples() { /* ... código sin cambios ... */ }
-    async function generateProposalsWithAI() { /* ... código sin cambios ... */ }
-    function displayProposals() { /* ... código sin cambios ... */ }
-    function displayFinalActivity(index) { /* ... código sin cambios ... */ }
-    function downloadActivityAsPDF() { /* ... código sin cambios ... */ }
-    function downloadActivityAsWord() { /* ... código sin cambios ... */ }
-    function populateCareers() { /* ... código sin cambios ... */ }
-    function populateAIFrameworks() { /* ... código sin cambios ... */ }
-    function populateAILevelSelect() { /* ... código sin cambios ... */ }
+    function validateCurrentStep() {
+        const currentStepDiv = document.getElementById(`step-${currentStep}`);
+        const inputs = currentStepDiv.querySelectorAll('input[required], textarea[required], select[required]');
+        for (const input of inputs) {
+            if (!input.value.trim()) {
+                alert('Por favor, completa todos los campos para continuar.');
+                input.focus();
+                return false;
+            }
+        }
+        return true;
+    }
 
-    init();
-});
+    function captureAllUserData() {
+        userData.career = document.getElementById('career-select').value;
+        userData.subject = document.getElementById('subject-input').value;
+        userData.objective = document.getElementById('objective-input').value;
+        userData.studentContext = document.getElementById('student-context-input').value;
+        userData.modality = document.querySelector('input[name="modality"]:checked').value;
+        userData.duration = document.getElementById('duration-input').value;
+        userData.restrictions = document.getElementById('restrictions-input').value;
+        userData.workType = document.querySelector('input[name="work-type"]:checked').value;
+        const fileText = document.getElementById('file-upload')?.dataset.fileText || '';
+        const manualText = document.getElementById('extra-info-details').value;
+        userData.extraInfo = [manualText, fileText].filter(Boolean).join('\n\n--- Contenido del archivo ---\n\n');
+        userData.useAI = document.querySelector('input[name="use-ai"]:checked').value;
+        if (userData.useAI === 'si') {
+            userData.aiFramework = document.getElementById('ai-framework-select').value;
+            userData.aiLevel = document.getElementById('ai-level-select').value;
+        }
+    }
+
+    async function generateAndPopulateBloomExamples() {
+        const container = document.getElementById('bloom-table-container');
+        const introContainer = document.getElementById('bloom-intro-text');
+        introContainer.innerHTML = `<p>Para que un objetivo sea efectivo... (texto introductorio)</p>`;
+        container.innerHTML = `<div class="loading-spinner"></div><p>Generando ejemplos...</p>`;
+        const career = document.getElementById('career-select').value;
+        const subject = document.getElementById('subject-input').value;
+        if (!career || !subject) {
+            container.innerHTML = `<p style="color:red;">Por favor, regresa y selecciona una carrera y materia.</p>`;
+            return;
+        }
+        try {
+            const response = await fetch('/.netlify/functions/generateExamples', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ career, subject })
+            });
+            const responseText = await response.text();
+            if (!response.ok) throw new Error(JSON.parse(responseText).error || 'Respuesta no válida.');
+            const examples = JSON.parse(responseText);
+            let tableHTML = '<table class="rubric-table">';
+            tableHTML += '<thead><tr><th>Dominio</th><th>Niveles</th><th>Ejemplo de Objetivo</th></tr></thead><tbody>';
+            for (const domainKey in dbData.bloomTaxonomy) {
+                const domainData = dbData.bloomTaxonomy[domainKey];
+                const exampleData = examples.find(ex => ex.domain === domainData.name);
+                let levelsList = '<ul>' + domainData.levels.map(level => `<li>${level.name}</li>`).join('') + '</ul>';
+                tableHTML += `<tr>
+                    <td><strong>${domainData.name}</strong><br><em>${domainData.description}</em></td>
+                    <td>${levelsList}</td>
+                    <td><strong>Ejemplo (Nivel: ${exampleData?.level || 'N/A'}):</strong><br><em>«${exampleData?.example || 'No se pudo generar.'}»</em></td>
+                </tr>`;
+            }
+            tableHTML += '</tbody></table>';
+            container.innerHTML = tableHTML;
+        } catch (error) {
+            console.error("Error en Bloom:", error);
+            container.innerHTML = `<p style="color:red;"><b>Error al generar ejemplos.</b><br><small>${error.message}</small></p>`;
+        }
+    }
+
+    async function generateProposalsWithAI() {
+        captureAllUserData();
+        showStep(11);
+        const proposalsContainer = document.getElementById('proposals-container');
+        const loadingDiv = document.getElementById('proposals-loading');
+        proposalsContainer.classList.add('hidden');
+        loadingDiv.classList.remove('hidden');
+        try {
+            const response = await fetch('/.netlify/functions/generateActivity', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(userData)
+            });
+            const responseText = await response.text();
+            if (!response.ok) throw new Error(JSON.parse(responseText).error || 'Error del servidor.');
+            const data = JSON.parse(responseText);
+            if (data.error) throw new Error(data.error);
+            generatedProposals = data.proposals;
+            displayProposals();
+        } catch (error) {
+            proposalsContainer.innerHTML = `<p style="color: red;"><b>Error al generar propuestas.</b><br><small>${error.message}</small></p>`;
+        } finally {
+            proposalsContainer.classList.remove('hidden');
+            loadingDiv.classList.add('hidden');
+        }
+    }
+
+    function displayProposals() {
+        const container = document.getElementById('proposals-container');
+        container.innerHTML = '';
+        if (!generatedProposals || generatedProposals.length < 2) {
+            container.innerHTML = `<p style="color: red;">La IA no devolvió las dos propuestas esperadas. Intenta de nuevo.</p>`;
+            return;
+        }
+        generatedProposals.forEach((proposal, index) => {
+            const title = proposal.match(/^# (.*)/m)?.[1] || `Propuesta ${index + 1}`;
+            const description = proposal.match(/^\* (.*)/m)?.[1] || "Una propuesta de actividad creativa.";
+            const proposalDiv = document.createElement('div');
+            proposalDiv.className = 'proposal';
+            proposalDiv.innerHTML = `<h4>${title}</h4><p>${description}</p><button class="select-proposal-btn" data-index="${index}">Elegir y ver detalles</button>`;
+            container.appendChild(proposalDiv);
+        });
+        document.querySelectorAll('.select-proposal-btn').forEach(button => {
+            button.addEventListener('click', (e) => displayFinalActivity(e.target.dataset.index));
+        });
+        document.getElementById('regenerate-proposals-btn').classList.remove('hidden');
+    }
+
+    function displayFinalActivity(index) {
+        const finalActivityHTML = window.marked.parse(generatedProposals[index]);
+        document.getElementById('final-activity-output').innerHTML = finalActivityHTML;
+        showStep(12);
+    }
+    
+    function downloadActivityAsPDF() {
+        const source = document.getElementById('final-activity-output');
+        if (!source || !source.innerHTML.trim()) { alert("No hay contenido para descargar."); return; }
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF({ orientation: 'p', unit: 'pt', format: 'letter' });
+        pdf.html(source, {
+            callback: function(doc) { doc.save('actividad_generada.
