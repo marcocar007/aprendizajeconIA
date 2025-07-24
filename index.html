@@ -8,8 +8,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.4.120/build/pdf.min.js"></script>
-    <script src="https://unpkg.com/mammoth@1.4.8/mammoth.browser.min.js"></script>
 </head>
 <body>
     <header>
@@ -18,68 +16,21 @@
         <p class="author">Creada por <a href="https://www.marcocarlosavalos.com/" target="_blank">Marco Carlos Avalos Rosado</a></p>
     </header>
     <main id="app-container">
-        <div id="step-9" class="step">
-            <h2>Material de aprendizaje</h2>
-            <p>¿Hay algún texto o información específica que la IA deba usar como base para la actividad? Puedes pegarlo aquí:</p>
-            <textarea id="extra-info-details" rows="6" placeholder="Pega aquí el texto..."></textarea>
-            
-            <p style="font-weight: bold; margin-top: 15px;">O sube un archivo (PDF, DOCX, TXT):</p>
-            <input type="file" id="file-upload" accept=".pdf,.docx,.txt">
-            <p id="file-upload-status" style="font-size: 0.9em; color: #333;"></p>
-            
-            <p style="font-size: 0.8em; color: #666;">Para un mejor rendimiento y para mantener la equidad en el acceso gratuito a la IA, por favor, sube archivos de menos de 5 páginas.</p>
-            
+        <div id="step-11" class="step">
+            <h2>Elige una Propuesta</h2>
+            <p>He generado dos propuestas... Elige la que mejor se adapte.</p>
+            <div id="proposals-loading" class="hidden">
+                <div class="loading-spinner"></div>
+                <p class="loading-text">Generando propuestas...</p>
+            </div>
+            <div id="proposals-container"></div>
             <div class="navigation-buttons">
-                <button class="prev-btn">Anterior</button>
-                <button class="next-btn">Siguiente</button>
-            </div>
-        </div>
-        
-        <div id="step-10" class="step">
-            <h2>Uso de Inteligencia Artificial por los Estudiantes</h2>
-            <div class="intro-ia">
-                <p><strong>Docente:</strong> Por esta única vez, te invitamos a revisar la siguiente información para elegir:</p>
-                <ul>
-                    <li>☑️ Usar IA en la actividad (con guías para su uso adecuado).</li>
-                    <li>☑️ Evitar el uso de IA (actividades tradicionales sin IA).</li>
-                </ul>
-                <p><strong>Objetivo:</strong> Garantizar que tu decisión se alinee con tus metas educativas. ¡Tú decides!</p>
-                <p><strong>Contexto que debes tomar en cuenta:</strong> Desde el lanzamiento de ChatGPT en 2022, la IA se ha incorporado a la enseñanza, derivando en 3 posibles opciones:</p>
-                <ul>
-                    <li>No utilizar la IA en absoluto.</li>
-                    <li>Utilizar la IA para aprender, con distintos niveles de uso.</li>
-                    <li>Utilizar la IA para aprender sobre su uso correcto y, además, aprender con ella.</li>
-                </ul>
-            </div>
-            <div class="tooltip-container">
-                <span class="tooltip-icon">?</span>
-                <div class="tooltip-text">
-                    <h4>Importancia Pedagógica</h4>
-                    <p><strong>Redefinición del aprendizaje:</strong> La IA permite personalizar el aprendizaje.</p>
-                    <p><strong>Fomento de habilidades de orden superior:</strong> Se busca que los estudiantes usen la IA para desarrollar pensamiento crítico, no como sustituto del pensamiento.</p>
-                    <p><strong>Alfabetización en IA:</strong> Es clave enseñar a usar la IA comprendiendo sus capacidades, limitaciones y sesgos.</p>
-                    <h4>Importancia Ética</h4>
-                    <p><strong>Transparencia y atribución:</strong> Es obligatorio declarar el uso de IA; no hacerlo se considera plagio.</p>
-                    <p><strong>Equidad e inclusión:</strong> Se deben reconocer y mitigar los sesgos de la IA.</p>
+                <button class="prev-btn">Ajustar Datos</button>
                 </div>
-            </div>
-            <div id="ai-frameworks-info"></div>
-            <hr>
-            <p><strong>¿Permitirás que tus estudiantes utilicen IA en esta actividad?</strong></p>
-            <input type="radio" id="use-ai-yes" name="use-ai" value="si"> <label for="use-ai-yes">Sí</label><br>
-            <input type="radio" id="use-ai-no" name="use-ai" value="no" checked> <label for="use-ai-no">No</label><br>
-            <div id="ai-level-selection" class="hidden" style="margin-top: 15px;">
-                <label for="ai-framework-select">Elige el marco de referencia:</label>
-                <select id="ai-framework-select"></select>
-                <label for="ai-level-select">Define el nivel de uso:</label>
-                <select id="ai-level-select"></select>
-            </div>
-            <div class="navigation-buttons">
-                <button class="prev-btn">Anterior</button>
-                <button id="generate-proposals-btn">✨ ¡Generar Propuestas!</button>
-            </div>
         </div>
 
+        <div id="step-1" class="step active"><h2>Bienvenido(a)</h2>...</div>
+        <div id="step-2" class="step"><h2>Contexto Académico</h2>...</div>
         </main>
     <script src="script.js"></script>
 </body>
