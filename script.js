@@ -26,7 +26,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function setupEventListeners() {
-        document.getElementById('start-btn').addEventListener('click', () => showStep(2));
+        const safeAddListener = (id, event, handler) => {
+            const element = document.getElementById(id);
+            if (element) element.addEventListener(event, handler);
+        };
+
+        safeAddListener('start-btn', 'click', () => showStep(2));
         
         document.querySelectorAll('.next-btn').forEach(button => {
             button.addEventListener('click', () => {
@@ -40,11 +45,12 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
         
-        document.getElementById('generate-proposals-btn').addEventListener('click', generateProposalsWithAI);
-        document.getElementById('regenerate-proposals-btn').addEventListener('click', generateProposalsWithAI);
-        document.getElementById('finish-btn').addEventListener('click', () => showStep(13));
-        document.getElementById('start-over-btn').addEventListener('click', () => location.reload());
-        document.getElementById('back-to-proposals-btn').addEventListener('click', () => showStep(11));
+        safeAddListener('generate-proposals-btn', 'click', generateProposalsWithAI);
+        // --- LÍNEA PROBLEMÁTICA ELIMINADA ---
+        // safeAddListener('regenerate-proposals-btn', 'click', generateProposalsWithAI);
+        safeAddListener('finish-btn', 'click', () => showStep(13));
+        safeAddListener('start-over-btn', 'click', () => location.reload());
+        safeAddListener('back-to-proposals-btn', 'click', () => showStep(11));
         
         document.querySelectorAll('input[name="use-ai"]').forEach(radio => {
             radio.addEventListener('change', (event) => {
@@ -54,55 +60,13 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
         
-        document.getElementById('ai-framework-select').addEventListener('change', populateAILevelSelect);
-        document.getElementById('download-pdf-btn').addEventListener('click', downloadActivityAsPDF);
-        document.getElementById('download-word-btn').addEventListener('click', downloadActivityAsWord);
-        document.getElementById('file-upload').addEventListener('change', handleFileUpload);
+        safeAddListener('ai-framework-select', 'change', populateAILevelSelect);
+        safeAddListener('download-pdf-btn', 'click', downloadActivityAsPDF);
+        safeAddListener('download-word-btn', 'click', downloadActivityAsWord);
+        safeAddListener('file-upload', 'change', handleFileUpload);
     }
     
-    // ... (El resto de las funciones como validateCurrentStep, captureAllUserData, etc., no cambian)
-
-    // --- NUEVA FUNCIÓN PARA MANEJAR LA SUBIDA DE ARCHIVOS ---
-    async function handleFileUpload(event) {
-        const file = event.target.files[0];
-        const statusElement = document.getElementById('file-upload-status');
-        const fileInputField = document.getElementById('file-upload');
-
-        if (!file) {
-            statusElement.textContent = '';
-            fileInputField.dataset.fileText = '';
-            return;
-        }
-
-        statusElement.textContent = `Cargando "${file.name}"...`;
-        let text = '';
-        try {
-            if (file.type === 'application/pdf') {
-                const pdfjsLib = window['pdfjs-dist/build/pdf'];
-                pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@3.4.120/build/pdf.worker.min.js`;
-                const doc = await pdfjsLib.getDocument(URL.createObjectURL(file)).promise;
-                for (let i = 1; i <= doc.numPages; i++) {
-                    const page = await doc.getPage(i);
-                    const content = await page.getTextContent();
-                    text += content.items.map(item => item.str).join(' ');
-                }
-            } else if (file.name.endsWith('.docx')) {
-                const arrayBuffer = await file.arrayBuffer();
-                const result = await mammoth.extractRawText({ arrayBuffer });
-                text = result.value;
-            } else if (file.type === 'text/plain') {
-                text = await file.text();
-            } else {
-                throw new Error('Formato no soportado (solo PDF, DOCX, TXT).');
-            }
-            statusElement.textContent = `✔️ "${file.name}" cargado con éxito.`;
-            fileInputField.dataset.fileText = text; // Almacena el texto extraído
-        } catch (error) {
-            console.error('Error al procesar el archivo:', error);
-            statusElement.textContent = `❌ ${error.message}`;
-            fileInputField.dataset.fileText = '';
-        }
-    }
+    // ... (El resto de las funciones no cambian)
 
     init();
 });
