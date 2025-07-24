@@ -202,4 +202,67 @@ document.addEventListener('DOMContentLoaded', () => {
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF({ orientation: 'p', unit: 'pt', format: 'letter' });
         pdf.html(source, {
-            callback: function(doc) { doc.save('actividad_generada.
+            callback: function(doc) { doc.save('actividad_generada.pdf'); },
+            margin: [40, 40, 40, 40], autoPaging: 'text', x: 0, y: 0,
+            width: 522, windowWidth: source.scrollWidth
+        });
+    }
+    
+    function downloadActivityAsWord() {
+        const source = document.getElementById('final-activity-output');
+        if (!source || !source.innerHTML.trim()) { alert("No hay contenido para descargar."); return; }
+        const sourceHTML = source.innerHTML;
+        const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Actividad</title></head><body>";
+        const footer = "</body></html>";
+        const blob = new Blob(['\ufeff', header + sourceHTML + footer], { type: 'application/msword' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = 'actividad_de_aprendizaje.doc';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    function populateCareers() {
+        const careerSelect = document.getElementById('career-select');
+        if (dbData.careers && careerSelect) {
+            dbData.careers.forEach(career => {
+                const option = document.createElement('option');
+                option.value = career.name;
+                option.textContent = career.name;
+                careerSelect.appendChild(option);
+            });
+        }
+    }
+
+    function populateAIFrameworks() {
+        const frameworksInfoDiv = document.getElementById('ai-frameworks-info');
+        if (!dbData.aiFrameworks || frameworksInfoDiv.innerHTML.trim() !== '') return;
+        frameworksInfoDiv.innerHTML = '';
+        Object.values(dbData.aiFrameworks).forEach(framework => {
+            let levelsHtml = '<ul>';
+            framework.levels.forEach(level => {
+                levelsHtml += `<li><strong>${level.name}:</strong> ${level.description || ''}</li>`;
+            });
+            levelsHtml += '</ul>';
+            frameworksInfoDiv.innerHTML += `<h4>${framework.name}</h4><p>${framework.description}</p>${levelsHtml}`;
+        });
+    }
+    
+    function populateAILevelSelect() {
+        const frameworkKey = document.getElementById('ai-framework-select').value;
+        const levelSelect = document.getElementById('ai-level-select');
+        levelSelect.innerHTML = '';
+        const framework = dbData.aiFrameworks[frameworkKey];
+        if (!framework) return;
+        framework.levels.forEach(level => {
+            const option = document.createElement('option');
+            option.value = level.name;
+            option.textContent = `${frameworkKey === 'go8' ? '' : 'Nivel ' + (level.level || '') + ': '}${level.name}`;
+            levelSelect.appendChild(option);
+        });
+    }
+
+    init();
+});
