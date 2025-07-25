@@ -12,122 +12,79 @@ document.addEventListener('DOMContentLoaded', () => {
     function setupEventListeners() {
         document.getElementById('generate-activity-btn').addEventListener('click', generateActivityWithAI);
         document.getElementById('start-over-btn').addEventListener('click', () => location.reload());
-        document.getElementById('file-upload').addEventListener('change', handleFileUpload);
+        
+        // --- INICIO DE LA MODIFICACIÓN ---
+        const careerSelect = document.getElementById('career-select');
+        const subjectInput = document.getElementById('subject-input');
+
+        // Se activa cuando el usuario cambia la carrera o termina de escribir la materia
+        careerSelect.addEventListener('change', triggerBloomGeneration);
+        subjectInput.addEventListener('blur', triggerBloomGeneration); // 'blur' es cuando se sale del campo
+        // --- FIN DE LA MODIFICACIÓN ---
     }
     
-    function validateForm() {
-        const requiredInputs = document.querySelectorAll('#form-container [required]');
-        for (const input of requiredInputs) {
-            if (!input.value.trim()) {
-                // Usamos el texto de la etiqueta 'label' asociada para el mensaje de error.
-                const label = document.querySelector(`label[for="${input.id}"]`);
-                const fieldName = label ? label.textContent : 'un campo';
-                alert(`Por favor, completa el campo obligatorio: ${fieldName}`);
-                input.focus();
-                return false;
-            }
-        }
-        return true;
-    }
-
-    function captureAllUserData() {
-        const userData = {};
-        userData.career = document.getElementById('career-select').value;
-        userData.subject = document.getElementById('subject-input').value;
-        userData.objective = document.getElementById('objective-input').value;
-        userData.studentContext = document.getElementById('student-context-input').value;
-        userData.restrictions = document.getElementById('restrictions-input').value;
-        const fileText = document.getElementById('file-upload').dataset.fileText || '';
-        const manualText = document.getElementById('extra-info-details').value;
-        userData.extraInfo = [manualText, fileText].filter(Boolean).join('\n\n--- Contenido del archivo ---\n\n');
-        userData.useAI = document.querySelector('input[name="use-ai"]:checked').value;
-        return userData;
-    }
-
-    async function handleFileUpload(event) {
-        const file = event.target.files[0];
-        const statusEl = document.getElementById('file-upload-status');
-        const fileInput = document.getElementById('file-upload');
-        if (!file) {
-            statusEl.textContent = '';
-            fileInput.dataset.fileText = '';
-            return;
-        }
-        statusEl.textContent = `Cargando "${file.name}"...`;
-        try {
-            let text = '';
-            if (file.type === 'application/pdf') {
-                const pdfjsLib = window['pdfjs-dist/build/pdf'];
-                pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@3.4.120/build/pdf.worker.min.js`;
-                const doc = await pdfjsLib.getDocument(URL.createObjectURL(file)).promise;
-                for (let i = 1; i <= doc.numPages; i++) {
-                    const page = await doc.getPage(i);
-                    const content = await page.getTextContent();
-                    text += content.items.map(item => item.str).join(' ');
-                }
-            } else if (file.name.endsWith('.docx')) {
-                const arrayBuffer = await file.arrayBuffer();
-                const result = await mammoth.extractRawText({ arrayBuffer });
-                text = result.value;
-            } else if (file.type === 'text/plain') {
-                text = await file.text();
-            } else {
-                throw new Error('Formato no soportado (PDF, DOCX, TXT).');
-            }
-            statusEl.textContent = `✔️ "${file.name}" cargado.`;
-            fileInput.dataset.fileText = text;
-        } catch (error) {
-            statusEl.textContent = `❌ ${error.message}`;
-            fileInput.dataset.fileText = '';
+    // --- NUEVA FUNCIÓN DISPARADORA ---
+    function triggerBloomGeneration() {
+        const career = document.getElementById('career-select').value;
+        const subject = document.getElementById('subject-input').value;
+        // Solo genera los ejemplos si ambos campos tienen valor
+        if (career && subject) {
+            generateAndPopulateBloomExamples();
         }
     }
 
-    async function generateActivityWithAI() {
-        if (!validateForm()) return;
-        
-        const userData = captureAllUserData();
-        document.getElementById('form-container').classList.add('hidden');
-        const resultContainer = document.getElementById('result-container');
-        resultContainer.classList.remove('hidden');
-        
-        const finalOutput = document.getElementById('final-activity-output');
-        const loadingContainer = document.getElementById('loading-container');
-        finalOutput.innerHTML = '';
-        loadingContainer.classList.remove('hidden');
-        document.getElementById('result-actions').classList.add('hidden');
+    // --- NUEVA FUNCIÓN PARA GENERAR EJEMPLOS DE BLOOM ---
+    async function generateAndPopulateBloomExamples() {
+        const container = document.getElementById('bloom-container');
+        container.innerHTML = `
+            <div class="loading-container">
+                <div class="loading-spinner"></div>
+                <p class="loading-text">Espera un momento por favor. Estamos generando ejemplos de objetivos de aprendizaje...</p>
+            </div>`;
+
+        const career = document.getElementById('career-select').value;
+        const subject = document.getElementById('subject-input').value;
 
         try {
-            const response = await fetch('/.netlify/functions/generateActivity', {
+            const response = await fetch('/.netlify/functions/generateExamples', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(userData)
+                body: JSON.stringify({ career, subject })
             });
-            const data = await response.json();
-            if (!response.ok || data.error) throw new Error(data.error || 'El servidor respondió con un error.');
+            const responseText = await response.text();
+            if (!response.ok) throw new Error(JSON.parse(responseText).error || 'Respuesta no válida del servidor.');
             
-            // Usamos la librería 'marked' para convertir la respuesta de Markdown a HTML
-            const finalActivityHTML = window.marked.parse(data.activity);
-            finalOutput.innerHTML = finalActivityHTML;
+            const examples = JSON.parse(responseText);
+            
+            let tableHTML = '<table class="rubric-table">';
+            tableHTML += '<thead><tr><th>Dominio</th><th>Niveles (de simple a complejo)</th><th>Ejemplo de Objetivo</th></tr></thead><tbody>';
+            
+            for (const domainKey in dbData.bloomTaxonomy) {
+                const domainData = dbData.bloomTaxonomy[domainKey];
+                const exampleData = examples.find(ex => ex.domain === domainData.name);
+                
+                let levelsList = '<ul>';
+                domainData.levels.forEach(level => {
+                    levelsList += `<li>${level.name}</li>`;
+                });
+                levelsList += '</ul>';
+
+                tableHTML += `<tr>
+                    <td><strong>${domainData.name}</strong><br><em>${domainData.description}</em></td>
+                    <td>${levelsList}</td>
+                    <td><strong>Ejemplo (Nivel: ${exampleData?.level || 'N/A'}):</strong><br><em>«${exampleData?.example || 'No se pudo generar ejemplo.'}»</em></td>
+                </tr>`;
+            }
+            tableHTML += '</tbody></table>';
+            container.innerHTML = tableHTML;
 
         } catch (error) {
-            finalOutput.innerHTML = `<p style="color: red;"><b>Lo sentimos, ocurrió un error.</b><br>${error.message}</p>`;
-        } finally {
-            loadingContainer.classList.add('hidden');
-            document.getElementById('result-actions').classList.remove('hidden');
+            console.error("Error generando ejemplos de Bloom:", error);
+            container.innerHTML = `<p style="color:red;"><b>No se pudieron generar los ejemplos.</b><br><small>${error.message}</small></p>`;
         }
     }
-    
-    function populateCareers() {
-        const careerSelect = document.getElementById('career-select');
-        if (dbData.careers) {
-            dbData.careers.forEach(career => {
-                const option = document.createElement('option');
-                option.value = career.name;
-                option.textContent = career.name;
-                careerSelect.appendChild(option);
-            });
-        }
-    }
+
+    // ... (El resto de las funciones de tu script.js no necesitan cambios)
 
     init();
 });
