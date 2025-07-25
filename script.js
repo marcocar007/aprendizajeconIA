@@ -12,13 +12,17 @@ document.addEventListener('DOMContentLoaded', () => {
     function setupEventListeners() {
         document.getElementById('generate-activity-btn').addEventListener('click', generateActivityWithAI);
         document.getElementById('start-over-btn').addEventListener('click', () => location.reload());
+        document.getElementById('file-upload').addEventListener('change', handleFileUpload);
     }
     
     function validateForm() {
         const requiredInputs = document.querySelectorAll('#form-container [required]');
         for (const input of requiredInputs) {
             if (!input.value.trim()) {
-                alert(`Por favor, completa el campo: "${input.labels[0].textContent}"`);
+                // Usamos el texto de la etiqueta 'label' asociada para el mensaje de error.
+                const label = document.querySelector(`label[for="${input.id}"]`);
+                const fieldName = label ? label.textContent : 'un campo';
+                alert(`Por favor, completa el campo obligatorio: ${fieldName}`);
                 input.focus();
                 return false;
             }
@@ -33,9 +37,49 @@ document.addEventListener('DOMContentLoaded', () => {
         userData.objective = document.getElementById('objective-input').value;
         userData.studentContext = document.getElementById('student-context-input').value;
         userData.restrictions = document.getElementById('restrictions-input').value;
-        userData.extraInfo = document.getElementById('extra-info-details').value;
+        const fileText = document.getElementById('file-upload').dataset.fileText || '';
+        const manualText = document.getElementById('extra-info-details').value;
+        userData.extraInfo = [manualText, fileText].filter(Boolean).join('\n\n--- Contenido del archivo ---\n\n');
         userData.useAI = document.querySelector('input[name="use-ai"]:checked').value;
         return userData;
+    }
+
+    async function handleFileUpload(event) {
+        const file = event.target.files[0];
+        const statusEl = document.getElementById('file-upload-status');
+        const fileInput = document.getElementById('file-upload');
+        if (!file) {
+            statusEl.textContent = '';
+            fileInput.dataset.fileText = '';
+            return;
+        }
+        statusEl.textContent = `Cargando "${file.name}"...`;
+        try {
+            let text = '';
+            if (file.type === 'application/pdf') {
+                const pdfjsLib = window['pdfjs-dist/build/pdf'];
+                pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@3.4.120/build/pdf.worker.min.js`;
+                const doc = await pdfjsLib.getDocument(URL.createObjectURL(file)).promise;
+                for (let i = 1; i <= doc.numPages; i++) {
+                    const page = await doc.getPage(i);
+                    const content = await page.getTextContent();
+                    text += content.items.map(item => item.str).join(' ');
+                }
+            } else if (file.name.endsWith('.docx')) {
+                const arrayBuffer = await file.arrayBuffer();
+                const result = await mammoth.extractRawText({ arrayBuffer });
+                text = result.value;
+            } else if (file.type === 'text/plain') {
+                text = await file.text();
+            } else {
+                throw new Error('Formato no soportado (PDF, DOCX, TXT).');
+            }
+            statusEl.textContent = `✔️ "${file.name}" cargado.`;
+            fileInput.dataset.fileText = text;
+        } catch (error) {
+            statusEl.textContent = `❌ ${error.message}`;
+            fileInput.dataset.fileText = '';
+        }
     }
 
     async function generateActivityWithAI() {
@@ -61,6 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
             if (!response.ok || data.error) throw new Error(data.error || 'El servidor respondió con un error.');
             
+            // Usamos la librería 'marked' para convertir la respuesta de Markdown a HTML
             const finalActivityHTML = window.marked.parse(data.activity);
             finalOutput.innerHTML = finalActivityHTML;
 
