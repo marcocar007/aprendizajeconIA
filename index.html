@@ -40,11 +40,13 @@
             </div>
 
             <div class="form-section">
-                <h2>4. Materiales y Restricciones</h2>
-                <label for="restrictions-input">Especificaciones o restricciones:</label>
-                <textarea id="restrictions-input" rows="3" placeholder="Ej: Uso de cartulinas, no hay Internet, deben usar una lectura específica."></textarea>
+                <h2>4. Material de aprendizaje</h2>
                 <label for="extra-info-details">Pega aquí cualquier texto base para la actividad:</label>
                 <textarea id="extra-info-details" rows="6" placeholder="Pega aquí el contenido de una lectura, un caso de estudio, etc."></textarea>
+                <label for="file-upload" class="upload-label">O sube un archivo (PDF, DOCX, TXT):</label>
+                <input type="file" id="file-upload" accept=".pdf,.docx,.txt">
+                <p id="file-upload-status"></p>
+                <p class="upload-note">Para un mejor rendimiento y para mantener la equidad en el acceso gratuito a la IA, por favor, sube archivos de menos de 5 páginas.</p>
             </div>
 
             <div class="form-section">
