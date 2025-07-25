@@ -1,69 +1,88 @@
 document.addEventListener('DOMContentLoaded', () => {
-    let currentStep = 1;
     let dbData = {};
-    const userData = {};
-    let generatedProposals = [];
 
     function init() {
         fetch('database.json').then(res => res.json()).then(data => {
             dbData = data;
             populateCareers();
-            populateAIFrameworks();
             setupEventListeners();
         });
     }
 
-    function showStep(stepNumber) {
-        document.querySelectorAll('.step').forEach(step => step.classList.remove('active'));
-        const nextStepElement = document.getElementById(`step-${stepNumber}`);
-        if (nextStepElement) {
-            currentStep = stepNumber;
-            if (stepNumber === 4) generateAndPopulateBloomExamples();
-            nextStepElement.classList.add('active');
-        }
-    }
-
     function setupEventListeners() {
-        const safeAddListener = (id, event, handler) => {
-            const el = document.getElementById(id);
-            if (el) el.addEventListener(event, handler);
-        };
-        safeAddListener('start-btn', 'click', () => showStep(2));
-        document.querySelectorAll('.next-btn').forEach(btn => btn.addEventListener('click', () => {
-            if (validateCurrentStep()) showStep(currentStep + 1);
-        }));
-        document.querySelectorAll('.prev-btn').forEach(btn => btn.addEventListener('click', () => {
-            if (currentStep > 1) showStep(currentStep - 1);
-        }));
-        safeAddListener('generate-proposals-btn', 'click', generateProposalsWithAI);
-        safeAddListener('regenerate-proposals-btn', 'click', generateProposalsWithAI);
-        safeAddListener('back-to-proposals-btn', 'click', () => showStep(11));
-        document.querySelectorAll('input[name="use-ai"]').forEach(radio => radio.addEventListener('change', (e) => {
-            const isAISelected = e.target.value === 'si';
-            document.getElementById('ai-level-selection').classList.toggle('hidden', !isAISelected);
-            if (isAISelected) populateAILevelSelect();
-        }));
-        safeAddListener('ai-framework-select', 'change', populateAILevelSelect);
-        safeAddListener('file-upload', 'change', handleFileUpload);
+        document.getElementById('generate-activity-btn').addEventListener('click', generateActivityWithAI);
+        document.getElementById('start-over-btn').addEventListener('click', () => location.reload());
     }
     
-    function validateCurrentStep() { /* ... código sin cambios ... */ }
-    function captureAllUserData() { /* ... código sin cambios ... */ }
-    async function handleFileUpload(event) { /* ... código de la versión anterior ... */ }
-    async function generateAndPopulateBloomExamples() { /* ... código de la versión anterior ... */ }
-    async function generateProposalsWithAI() { /* ... código de la versión anterior ... */ }
-    function displayProposals() { /* ... código de la versión anterior ... */ }
-    function displayFinalActivity(index) { /* ... código de la versión anterior ... */ }
-    function populateCareers() { /* ... código sin cambios ... */ }
-    function populateAIFrameworks() {
-        const frameworksInfoDiv = document.getElementById('ai-frameworks-info');
-        if (!dbData.aiFrameworks || frameworksInfoDiv.innerHTML.trim() !== '') return;
-        Object.values(dbData.aiFrameworks).forEach(framework => {
-            let levelsHtml = '<ul>' + framework.levels.map(level => `<li><strong>${level.name}:</strong> ${level.description || ''}</li>`).join('') + '</ul>';
-            frameworksInfoDiv.innerHTML += `<h4>${framework.name}</h4><p>${framework.description}</p>${levelsHtml}`;
-        });
+    function validateForm() {
+        const requiredInputs = document.querySelectorAll('#form-container [required]');
+        for (const input of requiredInputs) {
+            if (!input.value.trim()) {
+                alert(`Por favor, completa el campo: "${input.labels[0].textContent}"`);
+                input.focus();
+                return false;
+            }
+        }
+        return true;
     }
-    function populateAILevelSelect() { /* ... código sin cambios ... */ }
+
+    function captureAllUserData() {
+        const userData = {};
+        userData.career = document.getElementById('career-select').value;
+        userData.subject = document.getElementById('subject-input').value;
+        userData.objective = document.getElementById('objective-input').value;
+        userData.studentContext = document.getElementById('student-context-input').value;
+        userData.restrictions = document.getElementById('restrictions-input').value;
+        userData.extraInfo = document.getElementById('extra-info-details').value;
+        userData.useAI = document.querySelector('input[name="use-ai"]:checked').value;
+        return userData;
+    }
+
+    async function generateActivityWithAI() {
+        if (!validateForm()) return;
+        
+        const userData = captureAllUserData();
+        document.getElementById('form-container').classList.add('hidden');
+        const resultContainer = document.getElementById('result-container');
+        resultContainer.classList.remove('hidden');
+        
+        const finalOutput = document.getElementById('final-activity-output');
+        const loadingContainer = document.getElementById('loading-container');
+        finalOutput.innerHTML = '';
+        loadingContainer.classList.remove('hidden');
+        document.getElementById('result-actions').classList.add('hidden');
+
+        try {
+            const response = await fetch('/.netlify/functions/generateActivity', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(userData)
+            });
+            const data = await response.json();
+            if (!response.ok || data.error) throw new Error(data.error || 'El servidor respondió con un error.');
+            
+            const finalActivityHTML = window.marked.parse(data.activity);
+            finalOutput.innerHTML = finalActivityHTML;
+
+        } catch (error) {
+            finalOutput.innerHTML = `<p style="color: red;"><b>Lo sentimos, ocurrió un error.</b><br>${error.message}</p>`;
+        } finally {
+            loadingContainer.classList.add('hidden');
+            document.getElementById('result-actions').classList.remove('hidden');
+        }
+    }
+    
+    function populateCareers() {
+        const careerSelect = document.getElementById('career-select');
+        if (dbData.careers) {
+            dbData.careers.forEach(career => {
+                const option = document.createElement('option');
+                option.value = career.name;
+                option.textContent = career.name;
+                careerSelect.appendChild(option);
+            });
+        }
+    }
 
     init();
 });
