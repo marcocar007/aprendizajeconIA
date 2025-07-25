@@ -18,126 +18,62 @@
         <p class="author">Creada por <a href="https://www.marcocarlosavalos.com/" target="_blank">Marco Carlos Avalos Rosado</a></p>
     </header>
     <main id="app-container">
-        <div id="step-1" class="step active">
-            <h2>Bienvenido(a)</h2>
-            <p>Soy tu guía para diseñar actividades de aprendizaje innovadoras, fundamentadas en sólidos principios pedagógicos y potenciadas por inteligencia artificial.</p>
-            <button id="start-btn">Comenzar</button>
-        </div>
+        <div id="form-container">
+            <div class="form-section">
+                <h2>1. Contexto Académico</h2>
+                <label for="career-select">Carrera:</label>
+                <select id="career-select" name="career" required></select>
+                <label for="subject-input">Asignatura:</label>
+                <input type="text" id="subject-input" placeholder="Ej: Biología Celular y Molecular" required>
+            </div>
 
-        <div id="step-2" class="step">
-            <h2>Contexto Académico</h2>
-            <label for="career-select">¿En qué carrera se aplicará la actividad?</label>
-            <select id="career-select" name="career" required></select>
-            <div class="navigation-buttons">
-                <button class="prev-btn">Anterior</button>
-                <button class="next-btn">Siguiente</button>
+            <div class="form-section">
+                <h2>2. Objetivo de Aprendizaje</h2>
+                <p>Define un objetivo claro usando la estructura: <strong>Verbo + Contenido + Propósito</strong>.</p>
+                <textarea id="objective-input" rows="4" placeholder="Ej: Diferenciar las estructuras de las células procariotas y eucariotas usando un microscopio óptico para comprender la base de la clasificación de los seres vivos." required></textarea>
             </div>
-        </div>
 
-        <div id="step-3" class="step">
-            <h2>Nombre de la Asignatura</h2>
-            <label for="subject-input">¿Cuál es el nombre de la asignatura?</label>
-            <input type="text" id="subject-input" placeholder="Ej: Biología Celular y Molecular" required>
-            <div class="navigation-buttons">
-                <button class="prev-btn">Anterior</button>
-                <button class="next-btn">Siguiente</button>
+            <div class="form-section">
+                <h2>3. Contexto del Grupo y Actividad</h2>
+                <label for="student-context-input">Describe el contexto de aprendizaje de tus estudiantes:</label>
+                <textarea id="student-context-input" rows="4" placeholder="Ej: son 35 estudiantes, con acceso limitado a IA generativa, se distraen con el teléfono celular, les gusta aprender haciendo, etcétera" required></textarea>
             </div>
-        </div>
 
-        <div id="step-4" class="step">
-            <h2>Definiendo el Objetivo de Aprendizaje</h2>
-            <div id="bloom-intro-text"></div>
-            <div id="bloom-table-container"></div>
-            <hr>
-            <label for="objective-input"><strong>Ahora, escribe tu objetivo de aprendizaje:</strong></label>
-            <textarea id="objective-input" rows="4" placeholder="Ej: Diferenciar las estructuras de las células procariotas y eucariotas..." required></textarea>
-            <div class="navigation-buttons">
-                <button class="prev-btn">Anterior</button>
-                <button class="next-btn">Siguiente</button>
+            <div class="form-section">
+                <h2>4. Materiales y Restricciones</h2>
+                <label for="restrictions-input">Especificaciones o restricciones:</label>
+                <textarea id="restrictions-input" rows="3" placeholder="Ej: Uso de cartulinas, no hay Internet, deben usar una lectura específica."></textarea>
+                <label for="extra-info-details">Pega aquí cualquier texto base para la actividad:</label>
+                <textarea id="extra-info-details" rows="6" placeholder="Pega aquí el contenido de una lectura, un caso de estudio, etc."></textarea>
             </div>
-        </div>
 
-        <div id="step-5" class="step">
-            <h2>Contexto de los Estudiantes</h2>
-            <label for="student-context-input">Describe brevemente el contexto de tus estudiantes:</label>
-            <textarea id="student-context-input" rows="4" placeholder="Ej: son 35 estudiantes, con acceso limitado a IA generativa, se distraen con el teléfono celular, les gusta aprender haciendo, etcétera" required></textarea>
-            <div class="navigation-buttons">
-                <button class="prev-btn">Anterior</button>
-                <button class="next-btn">Siguiente</button>
-            </div>
-        </div>
-        
-        <div id="step-9" class="step">
-            <h2>Material de aprendizaje</h2>
-            <p>¿Hay algún texto o información específica que la IA deba usar como base para la actividad?</p>
-            <textarea id="extra-info-details" rows="6" placeholder="Pega aquí el texto..."></textarea>
-            <p class="upload-label">O sube un archivo (PDF, DOCX, TXT):</p>
-            <input type="file" id="file-upload" accept=".pdf,.docx,.txt">
-            <p id="file-upload-status"></p>
-            <p class="upload-note">Para un mejor rendimiento y para mantener la equidad en el acceso gratuito a la IA, por favor, sube archivos de menos de 5 páginas.</p>
-            <div class="navigation-buttons">
-                <button class="prev-btn">Anterior</button>
-                <button class="next-btn">Siguiente</button>
-            </div>
-        </div>
-        
-        <div id="step-10" class="step">
-            <h2>Uso de Inteligencia Artificial por los Estudiantes</h2>
-            <div class="intro-ia">
-                <p><strong>Docente:</strong> Por esta única vez, te invitamos a revisar la siguiente información para elegir:</p>
-                <ul><li>☑️ Usar IA en la actividad (con guías para su uso adecuado).</li><li>☑️ Evitar el uso de IA (actividades tradicionales sin IA).</li></ul>
-                <p><strong>Contexto:</strong> Desde el lanzamiento de ChatGPT, la IA se ha incorporado a la enseñanza, derivando en 3 opciones: No utilizarla, utilizarla para aprender con distintos niveles de uso, o utilizarla para aprender sobre su uso correcto y además, aprender con ella.</p>
-            </div>
-            <div class="tooltip-container">
-                <span class="tooltip-icon">?</span>
-                <div class="tooltip-text">
-                    <h4>Importancia Pedagógica</h4><p><strong>Redefinición del aprendizaje:</strong> La IA permite personalizar el aprendizaje.</p><p><strong>Fomento de habilidades de orden superior:</strong> Usar la IA para desarrollar pensamiento crítico, no como sustituto del pensamiento.</p><h4>Importancia Ética</h4><p><strong>Transparencia y atribución:</strong> Es obligatorio declarar el uso de IA; no hacerlo se considera plagio.</p><p><strong>Equidad e inclusión:</strong> Se deben reconocer y mitigar los sesgos de la IA.</p><p><strong>Conclusión:</strong> La IA es una realidad que debe integrarse de forma pedagógica y ética.</p>
+            <div class="form-section">
+                <h2>5. Uso de Inteligencia Artificial (por los estudiantes)</h2>
+                <p>Define si tus estudiantes podrán usar IA para esta actividad.</p>
+                <div class="radio-group">
+                    <input type="radio" id="use-ai-no" name="use-ai" value="no" checked> <label for="use-ai-no">No usar IA</label>
+                    <input type="radio" id="use-ai-yes" name="use-ai" value="si"> <label for="use-ai-yes">Sí usar IA</label>
                 </div>
             </div>
-            <div id="ai-frameworks-info"></div>
-            <hr>
-            <p><strong>¿Permitirás que tus estudiantes utilicen IA en esta actividad?</strong></p>
-            <input type="radio" id="use-ai-yes" name="use-ai" value="si"> <label for="use-ai-yes">Sí</label><br>
-            <input type="radio" id="use-ai-no" name="use-ai" value="no" checked> <label for="use-ai-no">No</label><br>
-            <div id="ai-level-selection" class="hidden" style="margin-top: 15px;">
-                <label for="ai-framework-select">Elige el marco de referencia:</label>
-                <select id="ai-framework-select"></select>
-                <label for="ai-level-select">Define el nivel de uso:</label>
-                <select id="ai-level-select"></select>
-            </div>
-            <div class="navigation-buttons">
-                <button class="prev-btn">Anterior</button>
-                <button id="generate-proposals-btn">✨ ¡Generar Propuestas!</button>
-            </div>
-        </div>
-        
-        <div id="step-11" class="step">
-            <h2>Elige una Propuesta</h2>
-            <div id="proposals-loading" class="hidden">
-                <div class="loading-spinner"></div>
-                <p class="loading-text">Generando propuestas...</p>
-            </div>
-            <div id="proposals-container"></div>
-            <div class="navigation-buttons">
-                <button class="prev-btn">Ajustar Datos</button>
-                <button id="regenerate-proposals-btn" class="hidden">Solicitar otras dos propuestas diferentes</button>
+
+            <div class="generate-section">
+                <button id="generate-activity-btn">✨ ¡Generar Actividad con IA!</button>
             </div>
         </div>
 
-        <div id="step-12" class="step">
-            <h2>Actividad de Aprendizaje Diseñada</h2>
-            <div id="final-activity-output"></div>
-            <div class="download-buttons" style="margin-top: 20px; text-align: center;">
-                <button id="download-pdf-btn">📥 Descargar PDF</button>
-                <button id="download-word-btn">📥 Descargar Word</button>
+        <div id="result-container" class="hidden">
+            <div id="loading-container" class="hidden">
+                <div class="loading-spinner"></div>
+                <p class="loading-text">Conectando con la IA para generar tu actividad... Esto puede tardar unos segundos.</p>
             </div>
-            <div class="navigation-buttons">
-                <button id="back-to-proposals-btn">Regresar a las Propuestas</button>
-                <button id="finish-btn">Finalizar</button>
+            <div id="final-activity-output"></div>
+            <div id="result-actions" class="hidden">
+                <div class="navigation-buttons">
+                    <button id="start-over-btn">Diseñar otra actividad</button>
+                </div>
             </div>
         </div>
-        
-        </main>
+    </main>
     <script src="script.js"></script>
 </body>
 </html>
