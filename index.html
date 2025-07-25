@@ -29,52 +29,17 @@
 
             <div class="form-section">
                 <h2>2. Objetivo de Aprendizaje</h2>
-                <p>Define un objetivo claro usando la estructura: <strong>Verbo + Contenido + Propósito</strong>.</p>
-                <textarea id="objective-input" rows="4" placeholder="Ej: Diferenciar las estructuras de las células procariotas y eucariotas usando un microscopio óptico para comprender la base de la clasificación de los seres vivos." required></textarea>
+                
+                <div id="bloom-container">
+                    </div>
+                <label for="objective-input"><strong>Ahora, escribe tu objetivo de aprendizaje:</strong></label>
+                <textarea id="objective-input" rows="4" placeholder="Ej: Diferenciar las estructuras de las células procariotas y eucariotas..." required></textarea>
             </div>
 
-            <div class="form-section">
-                <h2>3. Contexto del Grupo y Actividad</h2>
-                <label for="student-context-input">Describe el contexto de aprendizaje de tus estudiantes:</label>
-                <textarea id="student-context-input" rows="4" placeholder="Ej: son 35 estudiantes, con acceso limitado a IA generativa, se distraen con el teléfono celular, les gusta aprender haciendo, etcétera" required></textarea>
             </div>
-
-            <div class="form-section">
-                <h2>4. Material de aprendizaje</h2>
-                <label for="extra-info-details">Pega aquí cualquier texto base para la actividad:</label>
-                <textarea id="extra-info-details" rows="6" placeholder="Pega aquí el contenido de una lectura, un caso de estudio, etc."></textarea>
-                <label for="file-upload" class="upload-label">O sube un archivo (PDF, DOCX, TXT):</label>
-                <input type="file" id="file-upload" accept=".pdf,.docx,.txt">
-                <p id="file-upload-status"></p>
-                <p class="upload-note">Para un mejor rendimiento y para mantener la equidad en el acceso gratuito a la IA, por favor, sube archivos de menos de 5 páginas.</p>
-            </div>
-
-            <div class="form-section">
-                <h2>5. Uso de Inteligencia Artificial (por los estudiantes)</h2>
-                <p>Define si tus estudiantes podrán usar IA para esta actividad.</p>
-                <div class="radio-group">
-                    <input type="radio" id="use-ai-no" name="use-ai" value="no" checked> <label for="use-ai-no">No usar IA</label>
-                    <input type="radio" id="use-ai-yes" name="use-ai" value="si"> <label for="use-ai-yes">Sí usar IA</label>
-                </div>
-            </div>
-
-            <div class="generate-section">
-                <button id="generate-activity-btn">✨ ¡Generar Actividad con IA!</button>
-            </div>
-        </div>
 
         <div id="result-container" class="hidden">
-            <div id="loading-container" class="hidden">
-                <div class="loading-spinner"></div>
-                <p class="loading-text">Conectando con la IA para generar tu actividad... Esto puede tardar unos segundos.</p>
             </div>
-            <div id="final-activity-output"></div>
-            <div id="result-actions" class="hidden">
-                <div class="navigation-buttons">
-                    <button id="start-over-btn">Diseñar otra actividad</button>
-                </div>
-            </div>
-        </div>
     </main>
     <script src="script.js"></script>
 </body>
